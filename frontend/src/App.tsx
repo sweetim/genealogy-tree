@@ -1,4 +1,4 @@
-import { createRef, useEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 
 import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
 
@@ -206,7 +206,7 @@ function App() {
   }
 
   async function updatePersonRelationClickHandler() {
-    const PERSON_INFO = [
+    /* const PERSON_INFO = [
       {
         person_indexs: 0,
         parents: [],
@@ -272,7 +272,7 @@ function App() {
         parents: [4],
         childrens: []
       },
-    ]
+    ] */
 
     const transaction: InputTransactionData = {
       data: {
