@@ -27,7 +27,7 @@ function FamilyTree({ data }: FamilyTreeProps) {
       .attr("width", width)
       .attr("height", height)
 
-    const link = svg.append("g")
+    svg.append("g")
 
       .attr("transform", "translate(" + width / 2 + "," + 20 + ")")
       .attr("fill", "none")
@@ -63,7 +63,7 @@ function FamilyTree({ data }: FamilyTreeProps) {
       .attr("dy", "0.31em")
       .attr("x", d => d.children ? -6 : 6)
       .attr("y", d => d.children ? -12 : 12)
-      .attr("text-anchor", d => "middle")
+      .attr("text-anchor", _ => "middle")
       .text(d => d.data.name)
       .clone(true).lower()
       .attr("stroke", "white");
