@@ -3,7 +3,7 @@ import { FC } from "react"
 import GenealogyTree from "./GenealogyTree"
 import { Edge, Node } from "reactflow";
 import PersonEditor from "./PersonEditor";
-import dayjs from "dayjs";
+
 export enum PersonGender {
   Male = 1,
   Female

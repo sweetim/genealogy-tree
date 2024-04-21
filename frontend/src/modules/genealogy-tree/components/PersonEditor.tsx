@@ -89,7 +89,7 @@ type PersonEditorProps = {
 }
 
 
-const PersonEditor: FC<PersonEditorProps> = ({ nodes, edges }) => {
+const PersonEditor: FC<PersonEditorProps> = ({ nodes }) => {
   const [items, setItems] = useState<CollapseProps['items']>([])
 
   useEffect(() => {

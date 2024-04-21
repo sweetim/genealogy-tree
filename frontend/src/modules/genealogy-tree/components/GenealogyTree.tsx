@@ -1,5 +1,5 @@
-import { useCallback, FC, createRef, useEffect, useRef, useMemo } from "react";
-import ReactFlow, { Node, useNodesState, useEdgesState, addEdge, useReactFlow, Connection, Controls, ControlButton, MiniMap, Background, BackgroundVariant, ReactFlowProvider, OnConnect, OnConnectStart, OnConnectEnd, Edge, NodeProps, Handle, Position } from 'reactflow';
+import { useCallback, FC, useEffect, useRef, useMemo } from "react";
+import ReactFlow, { Node, useNodesState, useEdgesState, addEdge, useReactFlow, Controls, ControlButton, MiniMap, Background, BackgroundVariant, ReactFlowProvider, OnConnect, OnConnectStart, OnConnectEnd, Edge, NodeProps, Handle, Position } from 'reactflow';
 import * as Dagre from '@dagrejs/dagre'
 
 import 'reactflow/dist/style.css';
@@ -113,7 +113,7 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
         type: "personNode",
         data: {
           name: id.toString(),
-          dateOfBirth: new Date("01-01-1921")
+          dateOfBirth: "01-01-1921"
         },
       };
 
