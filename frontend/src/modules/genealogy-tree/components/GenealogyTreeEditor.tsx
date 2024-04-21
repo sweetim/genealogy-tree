@@ -3,7 +3,7 @@ import { FC } from "react"
 import GenealogyTree from "./GenealogyTree"
 import { Edge, Node } from "reactflow";
 import PersonEditor from "./PersonEditor";
-
+import dayjs from "dayjs";
 export enum PersonGender {
   Male = 1,
   Female
@@ -12,26 +12,26 @@ export enum PersonGender {
 export type PersonMetadata = {
   name?: string,
   age?: number,
-  dateOfBirth?: Date,
-  dateOfDeath?: Date,
+  dateOfBirth?: string,
+  dateOfDeath?: string,
   gender?: PersonGender,
   imageUri?: string,
 }
 
 const initialNodes: Node<PersonMetadata>[] = [
-  { id: "0", position: { x: 0, y: 0 }, data: { name: 'loh kam chew', dateOfBirth: new Date("01-01-1921") }, type: "personNode" },
-  { id: "1", position: { x: 0, y: 0 }, data: { name: 'loh wai meng', dateOfBirth: new Date("01-01-1921") }, type: "personNode" },
-  { id: "2", position: { x: 0, y: 0 }, data: { name: 'loh wai keen', dateOfBirth: new Date("01-01-1921") }, type: "personNode" },
-  { id: "3", position: { x: 0, y: 0 }, data: { name: 'loh wai sum', dateOfBirth: new Date("01-01-1921") }, type: "personNode" },
-  { id: "4", position: { x: 0, y: 0 }, data: { name: 'loh wai weng', dateOfBirth: new Date("01-01-1921") }, type: "personNode" },
-  { id: "5", position: { x: 0, y: 0 }, data: { name: 'loh wai mei', dateOfBirth: new Date("01-01-1921") }, type: "personNode" },
-  { id: "6", position: { x: 0, y: 0 }, data: { name: 'ho swee leong', dateOfBirth: new Date("01-01-1921") }, type: "personNode" },
-  { id: "7", position: { x: 0, y: 0 }, data: { name: 'ho swee tim', dateOfBirth: new Date("01-01-1921") }, type: "personNode" },
-  { id: "8", position: { x: 0, y: 0 }, data: { name: 'loh jin xiang', dateOfBirth: new Date("01-01-1921") }, type: "personNode" },
-  { id: "9", position: { x: 0, y: 0 }, data: { name: 'loh jin hoong', dateOfBirth: new Date("01-01-1921") }, type: "personNode" },
-  { id: "10", position: { x: 0, y: 0 }, data: { name: 'loh kai li', dateOfBirth: new Date("01-01-1921") }, type: "personNode" },
-  { id: "11", position: { x: 0, y: 0 }, data: { name: 'loh kai syuen', dateOfBirth: new Date("01-01-1921") }, type: "personNode" },
-  { id: "12", position: { x: 0, y: 0 }, data: { name: 'loh kai tyng', dateOfBirth: new Date("01-01-1921") }, type: "personNode" },
+  { id: "0", position: { x: 0, y: 0 }, data: { name: 'loh kam chew', dateOfBirth: "01-01-1921", gender: 1 }, type: "personNode" },
+  { id: "1", position: { x: 0, y: 0 }, data: { name: 'loh wai meng', dateOfBirth: "01-01-1921" }, type: "personNode" },
+  { id: "2", position: { x: 0, y: 0 }, data: { name: 'loh wai keen', dateOfBirth: "01-01-1921" }, type: "personNode" },
+  { id: "3", position: { x: 0, y: 0 }, data: { name: 'loh wai sum', dateOfBirth: "01-01-1921" }, type: "personNode" },
+  { id: "4", position: { x: 0, y: 0 }, data: { name: 'loh wai weng', dateOfBirth: "01-01-1921" }, type: "personNode" },
+  { id: "5", position: { x: 0, y: 0 }, data: { name: 'loh wai mei', dateOfBirth: "01-01-1921" }, type: "personNode" },
+  { id: "6", position: { x: 0, y: 0 }, data: { name: 'ho swee leong', dateOfBirth: "01-01-1921" }, type: "personNode" },
+  { id: "7", position: { x: 0, y: 0 }, data: { name: 'ho swee tim', dateOfBirth: "01-01-1921" }, type: "personNode" },
+  { id: "8", position: { x: 0, y: 0 }, data: { name: 'loh jin xiang', dateOfBirth: "01-01-1921" }, type: "personNode" },
+  { id: "9", position: { x: 0, y: 0 }, data: { name: 'loh jin hoong', dateOfBirth: "01-01-1921" }, type: "personNode" },
+  { id: "10", position: { x: 0, y: 0 }, data: { name: 'loh kai li', dateOfBirth: "01-01-1921" }, type: "personNode" },
+  { id: "11", position: { x: 0, y: 0 }, data: { name: 'loh kai syuen', dateOfBirth: "01-01-1921" }, type: "personNode" },
+  { id: "12", position: { x: 0, y: 0 }, data: { name: 'loh kai tyng', dateOfBirth: "01-01-1921" }, type: "personNode" },
 ]
 
 const initialEdges: Edge[] = [

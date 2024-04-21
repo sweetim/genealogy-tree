@@ -45,7 +45,7 @@ const PersonNode: FC<NodeProps<PersonMetadata>> = ({ data, isConnectable }) => {
         isConnectable={isConnectable} />
       <Flex align="center" justify='center' vertical className='h-full'>
         <Text strong>{data.name}</Text>
-        <Text type="secondary">{data.dateOfBirth?.getFullYear()}</Text>
+        <Text type="secondary">{(new Date(data.dateOfBirth!)).getFullYear()}</Text>
         {/* <Title className="m-0" level={5}>{data.label}</Title> */}
       </Flex>
       <Handle type="source" position={Position.Bottom} isConnectable={isConnectable} />
