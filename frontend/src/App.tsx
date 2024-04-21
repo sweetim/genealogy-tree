@@ -1,20 +1,17 @@
 import "@aptos-labs/wallet-adapter-ant-design/dist/index.css";
 
-import { createRef, useEffect, useState } from 'react'
-
+import { useState } from "react"
 
 import { WalletSelector } from "@aptos-labs/wallet-adapter-ant-design";
 
-import FamilyTree from './modules/genealogy-tree/components/GenealogyTree';
-import { Button, Flex, Layout } from 'antd';
-import { InputTransactionData, useWallet } from '@aptos-labs/wallet-adapter-react';
+import GenealogyTree from "./modules/genealogy-tree/components/GenealogyTree";
+import { Flex, Layout } from "antd";
 
-import GenealogyTreeLogo from './icons/GenealogyTreeLogo';
-
+import GenealogyTreeLogo from "./icons/GenealogyTreeLogo";
+import Sider from "antd/es/layout/Sider";
+import GenealogyTreeEditor from "./modules/genealogy-tree/components/GenealogyTreeEditor";
 
 const { Content, Header } = Layout
-
-
 
 function App() {
   // const { account, signAndSubmitTransaction } = useWallet()
@@ -26,13 +23,20 @@ function App() {
         <Flex className="h-full"
           justify="space-between"
           align="center">
-            <GenealogyTreeLogo className="w-12" />
+          <GenealogyTreeLogo className="w-12" />
           <WalletSelector />
         </Flex>
       </Header>
-      <Content className="h-full">
-        <FamilyTree data={data} />
-      </Content>
+        <Content className="h-full">
+        <GenealogyTreeEditor />
+          {/* */}
+        </Content>
+{/*
+      <Layout className="h-full">
+        <Sider className="bg-blue-200">
+          Sider
+        </Sider>
+      </Layout> */}
     </Layout>
   )
 }

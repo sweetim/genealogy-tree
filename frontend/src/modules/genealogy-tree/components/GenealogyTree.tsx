@@ -1,56 +1,24 @@
-import { useCallback, FC, createRef, useEffect, useRef } from "react";
-import ReactFlow, { useNodesState, useEdgesState, addEdge, useReactFlow, Connection, Controls, ControlButton, MiniMap, Background, BackgroundVariant, ReactFlowProvider } from 'reactflow';
+import { useCallback, FC, createRef, useEffect, useRef, useMemo } from "react";
+import ReactFlow, { Node, useNodesState, useEdgesState, addEdge, useReactFlow, Connection, Controls, ControlButton, MiniMap, Background, BackgroundVariant, ReactFlowProvider, OnConnect, OnConnectStart, OnConnectEnd, Edge, NodeProps, Handle, Position } from 'reactflow';
 import * as Dagre from '@dagrejs/dagre'
 
 import 'reactflow/dist/style.css';
 import { AlignCenterOutlined } from "@ant-design/icons";
-
-interface GenealogyTreeNode {
-  name: string;
-  children?: GenealogyTreeNode[];
-}
+import { PersonMetadata } from "./GenealogyTreeEditor";
+import { Flex, Typography } from "antd";
 
 type GenealogyTreeProps = {
-  data: GenealogyTreeNode
+  nodes: Node<PersonMetadata>[],
+  edges: Edge[],
 }
-const initialNodes = [
-  { id: "0", position: { x: 0, y: 0 }, data: { label: 'loh kam chew' } },
-  { id: "1", position: { x: 0, y: 0 }, data: { label: 'loh wai meng' } },
-  { id: "2", position: { x: 0, y: 0 }, data: { label: 'loh wai keen' } },
-  { id: "3", position: { x: 0, y: 0 }, data: { label: 'loh wai sum' } },
-  { id: "4", position: { x: 0, y: 0 }, data: { label: 'loh wai weng' } },
-  { id: "5", position: { x: 0, y: 0 }, data: { label: 'loh wai mei' } },
-  { id: "6", position: { x: 0, y: 0 }, data: { label: 'ho swee leong' } },
-  { id: "7", position: { x: 0, y: 0 }, data: { label: 'ho swee tim' } },
-  { id: "8", position: { x: 0, y: 0 }, data: { label: 'loh jin xiang' } },
-  { id: "9", position: { x: 0, y: 0 }, data: { label: 'loh jin hoong' } },
-  { id: "10", position: { x: 0, y: 0 }, data: { label: 'loh kai li' } },
-  { id: "11", position: { x: 0, y: 0 }, data: { label: 'loh kai syuen' } },
-  { id: "12", position: { x: 0, y: 0 }, data: { label: 'loh kai tyng' } }
-]
-
-const initialEdges = [
-  { id: 'e0-1', source: '0', target: '1', type: 'smoothstep' },
-  { id: 'e0-2', source: '0', target: '2', type: 'smoothstep' },
-  { id: 'e0-3', source: '0', target: '3', type: 'smoothstep' },
-  { id: 'e0-4', source: '0', target: '4', type: 'smoothstep' },
-  { id: 'e0-5', source: '0', target: '5', type: 'smoothstep' },
-  { id: 'e2-6', source: '2', target: '6', type: 'smoothstep' },
-  { id: 'e2-7', source: '2', target: '7', type: 'smoothstep' },
-  { id: 'e3-8', source: '3', target: '8', type: 'smoothstep' },
-  { id: 'e3-9', source: '3', target: '9', type: 'smoothstep' },
-  { id: 'e4-10', source: '4', target: '10', type: 'smoothstep' },
-  { id: 'e4-11', source: '4', target: '11', type: 'smoothstep' },
-  { id: 'e4-12', source: '4', target: '12', type: 'smoothstep' },
-];
 
 const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
-const getLayoutedElements = (nodes: any, edges: any, options: any) => {
+const getLayoutedElements = (nodes: Node[], edges: Edge[], options: any) => {
   g.setGraph({ rankdir: options.direction });
 
   edges.forEach((edge: any) => g.setEdge(edge.source, edge.target));
-  nodes.forEach((node: any) => g.setNode(node.id, node));
+  nodes.forEach((node: any) => g.setNode(node.id, { width: nodeWidth, height: nodeHeight }));
 
   Dagre.layout(g);
 
@@ -63,72 +31,107 @@ const getLayoutedElements = (nodes: any, edges: any, options: any) => {
     edges,
   };
 };
+const { Text } = Typography;
 
+const PersonNode: FC<NodeProps<PersonMetadata>> = ({ data, isConnectable }) => {
+  // function TextUpdaterNode({ data, isConnectable }: NodeProps<TextUpdaterNodeProps>) {
 
-const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ data }) => {
-  const { fitView, screenToFlowPosition } = useReactFlow();
+  return (
+    <div className="text-updater-node">
+      <Handle
+        className="bg-red-600"
+        type="target"
+        position={Position.Top}
+        isConnectable={isConnectable} />
+      <Flex align="center" justify='center' vertical className='h-full'>
+        <Text strong>{data.name}</Text>
+        <Text type="secondary">{data.dateOfBirth?.getFullYear()}</Text>
+        {/* <Title className="m-0" level={5}>{data.label}</Title> */}
+      </Flex>
+      <Handle type="source" position={Position.Bottom} isConnectable={isConnectable} />
+    </div>
+  );
+}
 
-  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+const nodeWidth = 142;
+const nodeHeight = 85;
+
+const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, edges: initialEdges }) => {
+  const { fitView, screenToFlowPosition, getNode } = useReactFlow();
+
+  const [nodes, setNodes, onNodesChange] = useNodesState([]);
+  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   useEffect(() => {
-    const layouted = getLayoutedElements(nodes, edges, { direction: "TB" });
+    const layouted = getLayoutedElements(initialNodes, initialEdges, { direction: "TB" });
 
     setNodes([...layouted.nodes]);
     setEdges([...layouted.edges]);
 
+    // window.requestAnimationFrame(() => {
+    //   fitView();
+    // });
   }, [initialNodes, initialEdges])
 
-  const connectingNodeId = useRef(null);
+  const connectingNodeId = useRef<string | null>(null);
 
-  const onConnect = useCallback(
-    (params: Connection) => {
+  const onConnect: OnConnect = useCallback(
+    (params) => {
       connectingNodeId.current = null
       setEdges((eds) => addEdge(params, eds))
     },
     [setEdges],
   );
 
-  const onConnectStart = useCallback((_: any, { nodeId }: any) => {
+  const onConnectStart: OnConnectStart = useCallback((_, { nodeId }) => {
     connectingNodeId.current = nodeId;
   }, []);
 
-  let id = 1000;
-  const getId = () => `${id++}`;
-  const onConnectEnd = useCallback(
-    (event: any) => {
-      console.log("hello")
+  const getId = () => Date.now().toString();
+  const onConnectEnd: OnConnectEnd = useCallback(
+    (event) => {
       if (!connectingNodeId.current) return;
 
-      const targetIsPane = event.target?.classList.contains('react-flow__pane');
+      const currentNode = getNode(connectingNodeId.current)
+      const currentMousePoisition = screenToFlowPosition({
+        x: event instanceof MouseEvent ? event.clientX : 0,
+        y: event instanceof MouseEvent ? event.clientY : 0,
+      })
 
-      if (targetIsPane) {
-        // we need to remove the wrapper bounds, in order to get the correct position
-        const id = getId()
-        const newNode: any = {
-          id,
-          position: screenToFlowPosition({
-            x: event.clientX,
-            y: event.clientY,
-          }),
-          data: { label: `new ${id}` },
-          origin: [0.5, 0.0],
-        };
+      const { y: currentNode_y } = currentNode?.position!
 
-        setNodes((nds) => nds.concat(newNode));
-        setEdges((eds) =>
-          eds.concat({ id, source: connectingNodeId.current, target: id }),
-        );
+      // negative is above in react flow coordinate system
+      const isAboveCurrentNode = () => {
+        return currentMousePoisition.y < currentNode_y
       }
+
+      const id = getId()
+
+      const newNode: Node<PersonMetadata> = {
+        id,
+        position: currentMousePoisition,
+        type: "personNode",
+        data: {
+          name: id.toString(),
+          dateOfBirth: new Date("01-01-1921")
+        },
+      };
+
+      const newEdge: Edge = {
+        id: `e${connectingNodeId.current}-${id}`,
+        source: isAboveCurrentNode() ? id : connectingNodeId.current,
+        target: isAboveCurrentNode() ? connectingNodeId.current : id,
+        type: 'smoothstep',
+        // sourceHandle: "bottom",
+        // targetHandle: "top"
+      }
+
+      setNodes((nds) => nds.concat(newNode));
+      setEdges((eds) => eds.concat(newEdge));
+
     },
     [screenToFlowPosition],
   );
-
-  useEffect(() => {
-    window.requestAnimationFrame(() => {
-      fitView();
-    });
-  }, [])
 
   function resetView() {
     const layouted = getLayoutedElements(nodes, edges, { direction: "TB" });
@@ -137,13 +140,17 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ data }) => {
     setEdges([...layouted.edges]);
 
     window.requestAnimationFrame(() => {
-      console.log("here")
       fitView();
     });
   }
 
+  const nodeTypes = useMemo(() => ({
+    personNode: PersonNode
+  }), [])
+
   return (
     <ReactFlow
+    nodeTypes={nodeTypes}
       nodes={nodes}
       edges={edges}
       onNodesChange={onNodesChange}
@@ -164,10 +171,10 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ data }) => {
   )
 }
 
-const GenealogyTree: FC<GenealogyTreeProps> = ({ data }) => {
+const GenealogyTree: FC<GenealogyTreeProps> = ({ nodes, edges }) => {
   return (
     <ReactFlowProvider >
-      <GenealogyTreeReactFlow data={data} />
+      <GenealogyTreeReactFlow edges={edges} nodes={nodes} />
     </ReactFlowProvider >
   )
 }
