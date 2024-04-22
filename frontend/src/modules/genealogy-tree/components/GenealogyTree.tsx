@@ -1,79 +1,74 @@
 import { useCallback, FC, useEffect, useRef, useMemo } from "react";
-import ReactFlow, { Node, useNodesState, useEdgesState, addEdge, useReactFlow, Controls, ControlButton, MiniMap, Background, BackgroundVariant, ReactFlowProvider, OnConnect, OnConnectStart, OnConnectEnd, Edge, NodeProps, Handle, Position } from 'reactflow';
+import ReactFlow, { Node, useNodesState, useEdgesState, addEdge, useReactFlow, Controls, ControlButton, MiniMap, Background, BackgroundVariant, ReactFlowProvider, OnConnect, OnConnectStart, OnConnectEnd, Edge } from 'reactflow';
 import * as Dagre from '@dagrejs/dagre'
+import { AlignCenterOutlined } from "@ant-design/icons";
 
 import 'reactflow/dist/style.css';
-import { AlignCenterOutlined } from "@ant-design/icons";
-import { PersonMetadata } from "./GenealogyTreeEditor";
-import { Flex, Typography } from "antd";
+
+import PersonNode from "./PersonNode";
+import { PersonMetadata } from "../model";
 
 type GenealogyTreeProps = {
   nodes: Node<PersonMetadata>[],
   edges: Edge[],
 }
 
-const g = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
+const NODE_DEFAULT_DIMENSTION = {
+  width: 150,
+  height: 90
+}
 
-const getLayoutedElements = (nodes: Node[], edges: Edge[], options: any) => {
-  g.setGraph({ rankdir: options.direction });
+enum GraphDirection {
+  TB = "TB",
+  LR = "LR"
+}
 
-  edges.forEach((edge: any) => g.setEdge(edge.source, edge.target));
-  nodes.forEach((node: any) => g.setNode(node.id, { width: nodeWidth, height: nodeHeight }));
+const graph = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
-  Dagre.layout(g);
+const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
+  graph.setGraph({
+    rankdir: GraphDirection.TB
+  });
+
+  edges.forEach(
+    (edge) => graph.setEdge(
+      edge.source,
+      edge.target))
+
+  nodes.forEach(
+    (node) => graph.setNode(
+      node.id,
+      {
+        width: NODE_DEFAULT_DIMENSTION.width,
+        height: NODE_DEFAULT_DIMENSTION.height
+      }));
+
+  Dagre.layout(graph)
 
   return {
-    nodes: nodes.map((node: any) => {
-      const { x, y } = g.node(node.id);
+    nodes: nodes.map((node) => {
+      const { x, y } = graph.node(node.id);
 
       return { ...node, position: { x, y } };
     }),
     edges,
   };
 };
-const { Text } = Typography;
-
-const PersonNode: FC<NodeProps<PersonMetadata>> = ({ data, isConnectable }) => {
-  // function TextUpdaterNode({ data, isConnectable }: NodeProps<TextUpdaterNodeProps>) {
-
-  return (
-    <div className="text-updater-node">
-      <Handle
-        className="bg-red-600"
-        type="target"
-        position={Position.Top}
-        isConnectable={isConnectable} />
-      <Flex align="center" justify='center' vertical className='h-full'>
-        <Text strong>{data.name}</Text>
-        <Text type="secondary">{(new Date(data.dateOfBirth!)).getFullYear()}</Text>
-        {/* <Title className="m-0" level={5}>{data.label}</Title> */}
-      </Flex>
-      <Handle type="source" position={Position.Bottom} isConnectable={isConnectable} />
-    </div>
-  );
-}
-
-const nodeWidth = 142;
-const nodeHeight = 85;
 
 const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, edges: initialEdges }) => {
+  const connectingNodeId = useRef<string | null>(null);
+
   const { fitView, screenToFlowPosition, getNode } = useReactFlow();
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
   useEffect(() => {
-    const layouted = getLayoutedElements(initialNodes, initialEdges, { direction: "TB" });
+    const layouted = getLayoutedElements(initialNodes, initialEdges);
 
     setNodes([...layouted.nodes]);
     setEdges([...layouted.edges]);
-
-    // window.requestAnimationFrame(() => {
-    //   fitView();
-    // });
   }, [initialNodes, initialEdges])
-
-  const connectingNodeId = useRef<string | null>(null);
 
   const onConnect: OnConnect = useCallback(
     (params) => {
@@ -87,7 +82,6 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
     connectingNodeId.current = nodeId;
   }, []);
 
-  const getId = () => Date.now().toString();
   const onConnectEnd: OnConnectEnd = useCallback(
     (event) => {
       if (!connectingNodeId.current) return;
@@ -105,7 +99,7 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
         return currentMousePoisition.y < currentNode_y
       }
 
-      const id = getId()
+      const id = Date.now().toString()
 
       const newNode: Node<PersonMetadata> = {
         id,
@@ -134,7 +128,7 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
   );
 
   function resetView() {
-    const layouted = getLayoutedElements(nodes, edges, { direction: "TB" });
+    const layouted = getLayoutedElements(nodes, edges);
 
     setNodes([...layouted.nodes]);
     setEdges([...layouted.edges]);
@@ -150,9 +144,9 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
 
   return (
     <ReactFlow
-    nodeTypes={nodeTypes}
       nodes={nodes}
       edges={edges}
+      nodeTypes={nodeTypes}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
@@ -173,7 +167,7 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
 
 const GenealogyTree: FC<GenealogyTreeProps> = ({ nodes, edges }) => {
   return (
-    <ReactFlowProvider >
+    <ReactFlowProvider>
       <GenealogyTreeReactFlow edges={edges} nodes={nodes} />
     </ReactFlowProvider >
   )

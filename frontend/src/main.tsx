@@ -15,7 +15,6 @@ const antThemeConfig: ThemeConfig = {
   // algorithm: theme.defaultAlgorithm,
   token: {
     fontFamily: "mali",
-    colorPrimary: "#ffe7ba"
   },
   components: {
     // Layout: {

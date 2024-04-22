@@ -3,20 +3,9 @@ import { FC } from "react"
 import GenealogyTree from "./GenealogyTree"
 import { Edge, Node } from "reactflow";
 import PersonEditor from "./PersonEditor";
+import { PersonMetadata } from "../model";
 
-export enum PersonGender {
-  Male = 1,
-  Female
-}
 
-export type PersonMetadata = {
-  name?: string,
-  age?: number,
-  dateOfBirth?: string,
-  dateOfDeath?: string,
-  gender?: PersonGender,
-  imageUri?: string,
-}
 
 const initialNodes: Node<PersonMetadata>[] = [
   { id: "0", position: { x: 0, y: 0 }, data: { name: 'loh kam chew', dateOfBirth: "01-01-1921", gender: 1 }, type: "personNode" },
