@@ -1,11 +1,10 @@
-import { Col, Row } from "antd"
 import { FC } from "react"
+import { Col, Row } from "antd"
+import { Edge, Node } from "reactflow"
+
 import GenealogyTree from "./GenealogyTree"
-import { Edge, Node } from "reactflow";
-import PersonEditor from "./PersonEditor";
-import { PersonMetadata } from "../model";
-
-
+import PersonEditor from "./PersonEditor"
+import { PersonMetadata } from "../model"
 
 const initialNodes: Node<PersonMetadata>[] = [
   { id: "0", position: { x: 0, y: 0 }, data: { name: 'loh kam chew', dateOfBirth: "01-01-1921", gender: 1 }, type: "personNode" },

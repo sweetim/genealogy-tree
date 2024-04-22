@@ -15,7 +15,7 @@ type GenealogyTreeProps = {
 
 const NODE_DEFAULT_DIMENSTION = {
   width: 150,
-  height: 90
+  height: 120
 }
 
 enum GraphDirection {
@@ -48,7 +48,6 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
   return {
     nodes: nodes.map((node) => {
       const { x, y } = graph.node(node.id);
-
       return { ...node, position: { x, y } };
     }),
     edges,
@@ -63,11 +62,19 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  useEffect(() => {
-    const layouted = getLayoutedElements(initialNodes, initialEdges);
+  function relayoutGraph(nodes: Node[], edges: Edge[]) {
+    const layouted = getLayoutedElements(nodes, edges);
 
     setNodes([...layouted.nodes]);
     setEdges([...layouted.edges]);
+
+    window.requestAnimationFrame(() => {
+      fitView();
+    });
+  }
+
+  useEffect(() => {
+    relayoutGraph(initialNodes, initialEdges)
   }, [initialNodes, initialEdges])
 
   const onConnect: OnConnect = useCallback(
@@ -92,11 +99,11 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
         y: event instanceof MouseEvent ? event.clientY : 0,
       })
 
-      const { y: currentNode_y } = currentNode?.position!
-
       // negative is above in react flow coordinate system
       const isAboveCurrentNode = () => {
-        return currentMousePoisition.y < currentNode_y
+        const y = currentNode?.position.y || 0
+
+        return currentMousePoisition.y < y
       }
 
       const id = Date.now().toString()
@@ -124,18 +131,11 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
       setEdges((eds) => eds.concat(newEdge));
 
     },
-    [screenToFlowPosition],
+    [screenToFlowPosition, getNode],
   );
 
   function resetView() {
-    const layouted = getLayoutedElements(nodes, edges);
-
-    setNodes([...layouted.nodes]);
-    setEdges([...layouted.edges]);
-
-    window.requestAnimationFrame(() => {
-      fitView();
-    });
+    relayoutGraph(nodes, edges)
   }
 
   const nodeTypes = useMemo(() => ({

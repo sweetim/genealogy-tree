@@ -21,14 +21,13 @@ const PersonEditor: FC<PersonEditorProps> = ({ nodes }) => {
     }))
 
     setItems(itemNodes)
-  }, [])
+  }, [nodes])
 
-  const onChange = (key: string | string[]) => {
-    console.log(key);
-  };
-
-  return <Collapse accordion
-     expandIconPosition="end" onChange={onChange} items={items} />;
+  return (
+    <Collapse accordion
+      expandIconPosition="end"
+      items={items} />
+  )
 }
 
 export default PersonEditor
