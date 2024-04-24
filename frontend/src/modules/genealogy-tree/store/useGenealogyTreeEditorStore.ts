@@ -38,7 +38,8 @@ const initialEdges: Edge[] = [
 interface GenealogyTreeEditorStore {
   nodes: Node<PersonMetadata>[],
   edges: Edge[],
-  updatePerson: (person: PersonMetadata) => void,
+  addNewPerson: (id: string, source: string, target: string, mouse_x: number, mouse_y: number) => void,
+  updatePerson: (id: string, person: PersonMetadata) => void,
 }
 
 const useGenealogyTreeEditorStore = create<GenealogyTreeEditorStore>()(
@@ -46,8 +47,31 @@ const useGenealogyTreeEditorStore = create<GenealogyTreeEditorStore>()(
     (set) => ({
       nodes: initialNodes,
       edges: initialEdges,
-      updatePerson: (person: PersonMetadata) => set((state) => {
-        const index = state.nodes.findIndex(n => n.data.name === person.name)
+      addNewPerson: (id: string, source: string, target: string, mouse_x: number, mouse_y: number) => set((state) => {
+        state.nodes.unshift({
+          id,
+          position: {
+            x: mouse_x,
+            y: mouse_y
+          },
+          type: "personNode",
+          data: {
+            name: "NEW Person - Update HERE"
+          }
+        })
+
+        state.edges.push({
+          id: `e${source}-${target}`,
+          source,
+          target,
+          type: 'smoothstep',
+        })
+      }),
+      updatePerson: (id: string, person: PersonMetadata) => set((state) => {
+        console.log("update", id, person)
+        // console.log(state.nodes)
+        const index = state.nodes.findIndex(n => n.id === id)
+        console.log(index)
         if (index !== -1) state.nodes[index].data = person
       })
     })

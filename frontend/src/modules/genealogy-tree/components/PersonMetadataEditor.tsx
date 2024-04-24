@@ -4,20 +4,22 @@ import { Button, DatePicker, Form, Input, Radio } from "antd"
 import { PersonGender, PersonMetadata } from "../model"
 import useGenealogyTreeEditorStore from "../store/useGenealogyTreeEditorStore"
 
-type PersonMetadataEditorProps = {
+export type PersonMetadataEditorProps = {
+  id: string,
   metadata: PersonMetadata
 }
 
-type PersonMetadataForm = {
+type PersonMetadataEditorForm = {
+  id: string,
   name: string,
   gender: number,
   dateOfBirth: Dayjs,
-  dateOfDeath: Dayjs | null
+  dateOfDeath: Dayjs | null,
 }
 
 const DATE_FORMAT = "YYYY-MM-DD"
 
-const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ metadata }) => {
+const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) => {
   const updatePerson = useGenealogyTreeEditorStore((state) => state.updatePerson)
 
   const formItemLayout = {
@@ -31,20 +33,22 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ metadata }) => {
     },
   };
 
-  const updatePersonUpdateFinishHandler = (values: PersonMetadataForm) => {
+  const updatePersonUpdateFinishHandler = (values: PersonMetadataEditorForm) => {
     const dateOfDeath = values.dateOfDeath
       ? dayjs(values.dateOfDeath).format(DATE_FORMAT)
       : ""
 
-    updatePerson({
+    updatePerson(id, {
       ...values,
       dateOfBirth: dayjs(values.dateOfBirth).format(DATE_FORMAT),
       dateOfDeath,
     })
   }
 
-  const initialValues = {
-    ...metadata,
+  const initialValues: PersonMetadataEditorForm = {
+    id,
+    name: metadata.name || "",
+    gender: metadata.gender || 0,
     dateOfBirth: dayjs(metadata.dateOfBirth),
     dateOfDeath: metadata.dateOfDeath ? dayjs(metadata.dateOfDeath) : null,
   }

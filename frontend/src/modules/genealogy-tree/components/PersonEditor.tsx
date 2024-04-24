@@ -2,7 +2,7 @@ import { FC, useEffect, useState } from "react"
 import { Collapse, CollapseProps } from "antd";
 import { Node, Edge } from "reactflow"
 
-import PersonMetadataEditor from "./PersonMetadataEditor";
+import PersonMetadataEditor, { PersonMetadataEditorProps } from "./PersonMetadataEditor";
 import { PersonMetadata } from "../model";
 
 type PersonEditorProps = {
@@ -14,11 +14,18 @@ const PersonEditor: FC<PersonEditorProps> = ({ nodes }) => {
   const [items, setItems] = useState<CollapseProps['items']>([])
 
   useEffect(() => {
-    const itemNodes = nodes.map(n => ({
-      key: n.id,
-      label: n.data.name,
-      children: <PersonMetadataEditor metadata={n.data} />,
-    }))
+    const itemNodes = nodes.map(n => {
+      const editorProps: PersonMetadataEditorProps = {
+        id: n.id,
+        metadata: n.data
+      }
+
+      return {
+        key: n.id,
+        label: n.data.name,
+        children: <PersonMetadataEditor {...editorProps} />,
+      }
+    })
 
     setItems(itemNodes)
   }, [nodes])

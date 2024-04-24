@@ -2,11 +2,13 @@ import { useCallback, FC, useEffect, useRef, useMemo } from "react";
 import ReactFlow, { Node, useNodesState, useEdgesState, addEdge, useReactFlow, Controls, ControlButton, MiniMap, Background, BackgroundVariant, ReactFlowProvider, OnConnect, OnConnectStart, OnConnectEnd, Edge } from 'reactflow';
 import * as Dagre from '@dagrejs/dagre'
 import { AlignCenterOutlined } from "@ant-design/icons";
+import { v4 as uuidv4 } from "uuid"
 
 import 'reactflow/dist/style.css';
 
 import PersonNode from "./PersonNode";
 import { PersonMetadata } from "../model";
+import useGenealogyTreeEditorStore from "../store/useGenealogyTreeEditorStore";
 
 type GenealogyTreeProps = {
   nodes: Node<PersonMetadata>[],
@@ -57,6 +59,8 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
 const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, edges: initialEdges }) => {
   const connectingNodeId = useRef<string | null>(null);
 
+  const addNewPerson = useGenealogyTreeEditorStore((state) => state.addNewPerson)
+
   const { fitView, screenToFlowPosition, getNode } = useReactFlow();
 
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
@@ -64,7 +68,7 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
 
   function relayoutGraph(nodes: Node[], edges: Edge[]) {
     const layouted = getLayoutedElements(nodes, edges);
-
+    console.log("here")
     setNodes([...layouted.nodes]);
     setEdges([...layouted.edges]);
 
@@ -106,29 +110,38 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
         return currentMousePoisition.y < y
       }
 
-      const id = Date.now().toString()
+      const id = uuidv4()
+      const source = isAboveCurrentNode() ? id : connectingNodeId.current
+      const target = isAboveCurrentNode() ? connectingNodeId.current : id
 
-      const newNode: Node<PersonMetadata> = {
+      addNewPerson(
         id,
-        position: currentMousePoisition,
-        type: "personNode",
-        data: {
-          name: id.toString(),
-          dateOfBirth: "01-01-1921"
-        },
-      };
+        source,
+        target,
+        currentMousePoisition.x,
+        currentMousePoisition.y)
 
-      const newEdge: Edge = {
-        id: `e${connectingNodeId.current}-${id}`,
-        source: isAboveCurrentNode() ? id : connectingNodeId.current,
-        target: isAboveCurrentNode() ? connectingNodeId.current : id,
-        type: 'smoothstep',
-        // sourceHandle: "bottom",
-        // targetHandle: "top"
-      }
+      // const newNode: Node<PersonMetadata> = {
+      //   id,
+      //   position: currentMousePoisition,
+      //   type: "personNode",
+      //   data: {
+      //     name: id.toString(),
+      //     dateOfBirth: "01-01-1921"
+      //   },
+      // };
 
-      setNodes((nds) => nds.concat(newNode));
-      setEdges((eds) => eds.concat(newEdge));
+      // const newEdge: Edge = {
+      //   id: `e${connectingNodeId.current}-${id}`,
+      //   source: isAboveCurrentNode() ? id : connectingNodeId.current,
+      //   target: isAboveCurrentNode() ? connectingNodeId.current : id,
+      //   type: 'smoothstep',
+      //   // sourceHandle: "bottom",
+      //   // targetHandle: "top"
+      // }
+
+      // setNodes((nds) => nds.concat(newNode));
+      // setEdges((eds) => eds.concat(newEdge));
 
     },
     [screenToFlowPosition, getNode],
