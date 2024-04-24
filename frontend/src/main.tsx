@@ -12,19 +12,9 @@ const wallets = [
 ]
 
 const antThemeConfig: ThemeConfig = {
-  // algorithm: theme.defaultAlgorithm,
   token: {
     fontFamily: "mali",
   },
-  components: {
-    // Layout: {
-    //   headerBg: "#192435",
-    //   bodyBg: "#1e293b"
-    // },
-    // Timeline: {
-    //   dotBg: "#1e293b"
-    // }
-  }
 }
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

@@ -8,6 +8,12 @@ const { Text } = Typography;
 
 const PersonNode: FC<NodeProps<PersonMetadata>> = ({ data, isConnectable }) => {
   const imageUri = `https://robohash.org/${data.name}?set=set1`
+  const yearOfBirth = (new Date(data.dateOfBirth!)).getFullYear()
+  const yearOfDeath = data.dateOfDeath
+    ? (new Date(data.dateOfDeath)).getFullYear()
+    : "living"
+
+  const yearsOfLiving = `${yearOfBirth} - ${yearOfDeath}`
 
   return (
     <div className="text-updater-node">
@@ -18,7 +24,7 @@ const PersonNode: FC<NodeProps<PersonMetadata>> = ({ data, isConnectable }) => {
       <Flex align="center" justify='center' vertical className='h-full'>
         <Avatar size={64} src={imageUri} />
         <Text strong>{data.name}</Text>
-        <Text type="secondary">{(new Date(data.dateOfBirth!)).getFullYear()}</Text>
+        <Text type="secondary">{yearsOfLiving}</Text>
       </Flex>
       <Handle type="source"
         position={Position.Bottom}

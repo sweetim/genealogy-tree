@@ -1,20 +1,25 @@
 import { FC } from "react"
-import dayjs from "dayjs"
+import dayjs, { Dayjs } from "dayjs"
 import { Button, DatePicker, Form, Input, Radio } from "antd"
 import { PersonGender, PersonMetadata } from "../model"
+import useGenealogyTreeEditorStore from "../store/useGenealogyTreeEditorStore"
 
 type PersonMetadataEditorProps = {
   metadata: PersonMetadata
 }
 
-export type PersonMetadataForm = {
+type PersonMetadataForm = {
   name: string,
   gender: number,
-  dateOfBirth: string,
-  dateOfDeath: string
+  dateOfBirth: Dayjs,
+  dateOfDeath: Dayjs | null
 }
 
+const DATE_FORMAT = "YYYY-MM-DD"
+
 const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ metadata }) => {
+  const updatePerson = useGenealogyTreeEditorStore((state) => state.updatePerson)
+
   const formItemLayout = {
     labelCol: {
       xs: { span: 24 },
@@ -27,15 +32,21 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ metadata }) => {
   };
 
   const updatePersonUpdateFinishHandler = (values: PersonMetadataForm) => {
-    console.log(values)
-    console.log(dayjs(values.dateOfBirth).format("DD-MM-YYYY"))
-    console.log(dayjs(values.dateOfDeath).format("DD-MM-YYYY"))
+    const dateOfDeath = values.dateOfDeath
+      ? dayjs(values.dateOfDeath).format(DATE_FORMAT)
+      : ""
+
+    updatePerson({
+      ...values,
+      dateOfBirth: dayjs(values.dateOfBirth).format(DATE_FORMAT),
+      dateOfDeath,
+    })
   }
 
   const initialValues = {
     ...metadata,
     dateOfBirth: dayjs(metadata.dateOfBirth),
-    dateOfDeath: dayjs(metadata.dateOfDeath),
+    dateOfDeath: metadata.dateOfDeath ? dayjs(metadata.dateOfDeath) : null,
   }
 
   return (
@@ -62,15 +73,8 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ metadata }) => {
       <Form.Item
         label="Date of Death"
         name="dateOfDeath"
-        rules={[{ required: true, message: 'Please input!' }]}
       >
-        <DatePicker renderExtraFooter={
-          () => (
-            <>
-              <Button>Alive</Button>
-            </>
-          )
-        } />
+        <DatePicker />
       </Form.Item>
       <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
         <Button type="primary" htmlType="submit">

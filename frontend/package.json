@@ -17,10 +17,12 @@
     "@dagrejs/dagre": "^1.1.2",
     "antd": "^5.16.2",
     "dayjs": "^1.11.10",
+    "immer": "^10.0.4",
     "petra-plugin-wallet-adapter": "^0.4.5",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "reactflow": "^11.11.1"
+    "reactflow": "^11.11.1",
+    "zustand": "^4.5.2"
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",
