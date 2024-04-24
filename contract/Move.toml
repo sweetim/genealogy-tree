@@ -4,13 +4,13 @@ version = "1.0.0"
 authors = []
 
 [addresses]
-genealogy_tree = "0x865dddd118a8e93c4852691fabe7c55f3db4bb67fbc354edeb2b401c7d6d3bc4"
+genealogy_tree = "0x8a9ed86121cbf83a25d1d3c90c15e2ffde05b2448b4fbee0dcc6e576a8528ce9"
 
 [dev-addresses]
 
 [dependencies.AptosFramework]
 git = "https://github.com/aptos-labs/aptos-core.git"
-rev = "mainnet"
+rev = "testnet"
 subdir = "aptos-move/framework/aptos-framework"
 
 [dev-dependencies]
