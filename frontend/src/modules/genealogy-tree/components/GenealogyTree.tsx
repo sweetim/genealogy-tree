@@ -68,7 +68,7 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
 
   function relayoutGraph(nodes: Node[], edges: Edge[]) {
     const layouted = getLayoutedElements(nodes, edges);
-    console.log("here")
+
     setNodes([...layouted.nodes]);
     setEdges([...layouted.edges]);
 

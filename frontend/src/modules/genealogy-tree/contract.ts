@@ -15,6 +15,15 @@ export type GenealogyTreePersonMetadata = {
   location: string,
 }
 
+export type PersonMetadataOnChain = {
+  id: string,
+  name: string,
+  gender: number,
+  date_of_birth: string,
+  date_of_death: string,
+  image_uri: string,
+}
+
 export const MODULE_ADDRESS = "0x865dddd118a8e93c4852691fabe7c55f3db4bb67fbc354edeb2b401c7d6d3bc4"
 
 

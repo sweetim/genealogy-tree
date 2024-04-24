@@ -6,8 +6,10 @@ import PersonEditor from "./PersonEditor"
 import useGenealogyTreeEditorStore from "../store/useGenealogyTreeEditorStore"
 
 const GenealogyTreeEditor: FC = () => {
-  const nodes = useGenealogyTreeEditorStore((state) => state.nodes);
-  const edges = useGenealogyTreeEditorStore((state) => state.edges);
+  const nodes = useGenealogyTreeEditorStore((state) => state.nodes)
+  const edges = useGenealogyTreeEditorStore((state) => state.edges)
+  const saveToChain = useGenealogyTreeEditorStore(state => state.saveToChain)
+
 
   function exportClickHandler() {
     console.log({
@@ -17,7 +19,7 @@ const GenealogyTreeEditor: FC = () => {
   }
 
   function saveClickHandler() {
-
+    saveToChain()
   }
 
   return (
