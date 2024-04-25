@@ -1,3 +1,5 @@
+import { getAptosClient } from "../../common/aptosClient"
+
 export type GenealogyTree = {
   childrens: string[],
   id: string,
@@ -24,73 +26,31 @@ export type PersonMetadataOnChain = {
   image_uri: string,
 }
 
-export const MODULE_ADDRESS = "0x865dddd118a8e93c4852691fabe7c55f3db4bb67fbc354edeb2b401c7d6d3bc4"
+export type PersonRelationOnChain = {
+  source: string,
+  target: string
+}
 
+export const MODULE_ADDRESS = "0x8a9ed86121cbf83a25d1d3c90c15e2ffde05b2448b4fbee0dcc6e576a8528ce9"
 
-// async function populatePersonClickHandler() {
-//   if (!account) return;
-//   console.log(account.address)
+const aptos = getAptosClient()
 
-//   const index = 12
-//   const transaction: InputTransactionData = {
-//     data: {
-//       function: `${MODULE_ADDRESS}::contract::register_person`,
-//       functionArguments: Object.values(PERSON_INFO[index])
-//     }
-//   }
+export async function getAllPersonMetadata(): Promise<PersonMetadataOnChain[]> {
+  const [value] = await aptos.view<PersonMetadataOnChain[][]>({
+    payload: {
+      function: `${MODULE_ADDRESS}::contract::get_all_person_metadata`,
+    }
+  })
 
-//   console.log(PERSON_INFO[index])
-//   try {
-//     const response: any = await signAndSubmitTransaction(transaction)
-//     await aptos.waitForTransaction({ transactionHash: response.hash })
-//   } catch (error) {
-//     console.log(error)
-//   }
-// }
+  return value
+}
 
-// async function updatePersonRelationClickHandler() {
-//   const transaction: InputTransactionData = {
-//     data: {
-//       function: `${MODULE_ADDRESS}::contract::update_person_relation`,
-//       functionArguments: [
-//         [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-//         [
-//           [],
-//           [0],
-//           [0],
-//           [0],
-//           [0],
-//           [0],
-//           [2],
-//           [2],
-//           [3],
-//           [3],
-//           [4],
-//           [4],
-//           [4],
-//         ],
-//         [
-//           [1, 2, 3, 4, 5],
-//           [],
-//           [6, 7],
-//           [8, 9],
-//           [10, 11, 12],
-//           [],
-//           [],
-//           [],
-//           [],
-//           [],
-//           [],
-//           [],
-//           []
-//         ]
-//       ]
-//     }
-//   }
-//   try {
-//     const response: any = await signAndSubmitTransaction(transaction)
-//     await aptos.waitForTransaction({ transactionHash: response.hash })
-//   } catch (error) {
-//     console.log(error)
-//   }
-// }
+export async function getAllPersonRelation(): Promise<PersonRelationOnChain[]> {
+  const [value] = await aptos.view<PersonRelationOnChain[][]>({
+    payload: {
+      function: `${MODULE_ADDRESS}::contract::get_all_person_relation`,
+    }
+  })
+
+  return value
+}

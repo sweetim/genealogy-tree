@@ -4,21 +4,25 @@ import { create } from "zustand";
 import { PersonMetadata } from "../model";
 import { immer } from "zustand/middleware/immer";
 
-import { DATA } from "./data"
+import { PersonMetadataOnChain, PersonRelationOnChain } from "../contract";
 
 interface GenealogyTreeEditorStore {
   nodes: Node<PersonMetadata>[],
+  nodesFromOnChain: Node<PersonMetadata>[],
   edges: Edge[],
+  edgesFromOnChain: Edge[],
   addNewPerson: (id: string, source: string, target: string, mouse_x: number, mouse_y: number) => void,
   updatePerson: (id: string, person: PersonMetadata) => void,
-  saveToChain: () => void
+  setDataFromOnChain: (person: PersonMetadataOnChain[], relation: PersonRelationOnChain[]) => void,
 }
 
 const useGenealogyTreeEditorStore = create<GenealogyTreeEditorStore>()(
   immer(
     (set, _get) => ({
-      nodes: DATA.nodes,
-      edges: DATA.edges,
+      nodes: [],
+      nodesFromOnChain: [],
+      edges: [],
+      edgesFromOnChain: [],
       addNewPerson: (id: string, source: string, target: string, mouse_x: number, mouse_y: number) => set((state) => {
         state.nodes.unshift({
           id,
@@ -43,34 +47,36 @@ const useGenealogyTreeEditorStore = create<GenealogyTreeEditorStore>()(
         const index = state.nodes.findIndex(n => n.id === id)
         if (index !== -1) state.nodes[index].data = person
       }),
-      saveToChain: () => set((_state) => {
-        // let personMetadataOnChain = get().nodes.map<PersonMetadataOnChain>(n => ({
-        //   id: n.id,
-        //   name: n.data.name || "",
-        //   gender: n.data.gender || 0,
-        //   date_of_birth: n.data.dateOfBirth || "",
-        //   date_of_death: n.data.dateOfDeath || "",
-        //   image_uri: n.data.imageUri || "",
-        // })).map(n => ({
-        //   function: "0x8a9ed86121cbf83a25d1d3c90c15e2ffde05b2448b4fbee0dcc6e576a8528ce9::contract::create_person_metadata",
-        //   functionArguments: Object.values(n),
-        // }))
-        // aptos.transaction.batch.forSingleAccount({ sender, data: payloads });
+      setDataFromOnChain: (person: PersonMetadataOnChain[], relation: PersonRelationOnChain[]) => set((state) => {
+        const nodes: Node<PersonMetadata>[] = person.map((p) => ({
+          id: p.id,
+          position: {
+            x: 0,
+            y: 0
+          },
+          data: {
+            name: p.name,
+            gender: p.gender,
+            dateOfBirth: p.date_of_birth,
+            dateOfDeath: p.date_of_death,
+            imageUri: p.image_uri,
+            age: 0
+          },
+          type: "personNode"
+        }))
 
-        // aptos.transaction.batch.on(TransactionWorkerEventsEnum.ExecutionFinish, async (data) => {
-        //   // log event output
-        //   console.log(data);
+        const edges: Edge[] = relation.map(r => ({
+          id: `e${r.source}-${r.target}`,
+          source: r.source,
+          target: r.target,
+          type: "smoothstep"
+        }))
 
-        //   // verify account sequence number
-        //   const account = await aptos.getAccountInfo({ accountAddress: sender.accountAddress });
-        //   console.log(`account sequence number is 101: ${account.sequence_number === "101"}`);
-
-        //   // worker finished execution, we can now unsubscribe from event listeners
-        //   aptos.transaction.batch.removeAllListeners();
-        //   process.exit(0);
-        // });
-        // console.log(personMetadataOnChain)
-      })
+        state.nodes = nodes
+        state.nodesFromOnChain = nodes
+        state.edges = edges
+        state.edgesFromOnChain = edges
+      }),
     })
   )
 );

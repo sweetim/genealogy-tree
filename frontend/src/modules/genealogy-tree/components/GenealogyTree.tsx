@@ -17,7 +17,7 @@ type GenealogyTreeProps = {
 
 const NODE_DEFAULT_DIMENSTION = {
   width: 150,
-  height: 120
+  height: 135
 }
 
 enum GraphDirection {
