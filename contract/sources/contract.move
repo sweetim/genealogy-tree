@@ -1,6 +1,7 @@
 module genealogy_tree::contract {
     use std::signer;
     use std::string::String;
+    use std::vector;
     use aptos_std::smart_table;
     use aptos_std::smart_table::SmartTable;
     use aptos_std::smart_vector;
@@ -180,5 +181,25 @@ module genealogy_tree::contract {
     public fun get_person_by_id(id: String): PersonMetadata acquires PersonMetadataDirectory {
         let person_metadata_directory = borrow_global<PersonMetadataDirectory>(get_genealogy_tree_address());
         *smart_table::borrow(&person_metadata_directory.person, id)
+    }
+
+    #[view]
+    public fun get_all_person_relation(): vector<PersonRelation> acquires PersonRelationDirectory {
+        let person_metadata_directory = borrow_global<PersonRelationDirectory>(get_genealogy_tree_address());
+
+        smart_vector::to_vector(&person_metadata_directory.person)
+    }
+
+    #[view]
+    public fun get_all_person_metadata(): vector<PersonMetadata> acquires PersonMetadataDirectory {
+        let person_metadata_directory = borrow_global<PersonMetadataDirectory>(get_genealogy_tree_address());
+
+        let output = vector[];
+
+        smart_table::for_each_ref(&person_metadata_directory.person, |_key, value| {
+            vector::push_back(&mut output, *value);
+        });
+
+        output
     }
 }
