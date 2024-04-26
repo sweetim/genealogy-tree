@@ -1,8 +1,11 @@
 import { FC } from "react"
 import dayjs, { Dayjs } from "dayjs"
-import { Button, DatePicker, Form, Input, Radio } from "antd"
+import { Button, DatePicker, Form, Input, Radio, Space } from "antd"
 import { PersonGender, PersonMetadata } from "../model"
 import useGenealogyTreeEditorStore from "../store/useGenealogyTreeEditorStore"
+import { getAptosClient } from "../../../common/aptosClient"
+import { useWallet } from "@aptos-labs/wallet-adapter-react"
+import { MODULE_ADDRESS } from "../contract"
 
 export type PersonMetadataEditorProps = {
   id: string,
@@ -19,7 +22,10 @@ type PersonMetadataEditorForm = {
 
 const DATE_FORMAT = "YYYY-MM-DD"
 
+const aptos = getAptosClient()
+
 const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) => {
+  const { signAndSubmitTransaction, account } = useWallet()
   const updatePerson = useGenealogyTreeEditorStore((state) => state.updatePerson)
 
   const formItemLayout = {
@@ -43,6 +49,20 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
       dateOfBirth: dayjs(values.dateOfBirth).format(DATE_FORMAT),
       dateOfDeath,
     })
+  }
+
+  const claimNFTClickHandler = async () => {
+    const response = await signAndSubmitTransaction({
+      sender: account?.address,
+      data: {
+        function: `${MODULE_ADDRESS}::contract::mint_person_nft`,
+        functionArguments: [
+          id
+        ],
+      },
+    });
+
+    await aptos.waitForTransaction({ transactionHash: response.hash });
   }
 
   const initialValues: PersonMetadataEditorForm = {
@@ -81,9 +101,14 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
         <DatePicker />
       </Form.Item>
       <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
-        <Button type="primary" htmlType="submit">
-          Update
-        </Button>
+        <Space >
+          <Button type="primary" htmlType="submit">
+            Update
+          </Button>
+          <Button type="primary" danger htmlType="button" onClick={claimNFTClickHandler}>
+            Claim NFT
+          </Button>
+        </Space>
       </Form.Item>
     </Form>
   )

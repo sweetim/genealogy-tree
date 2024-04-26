@@ -1,14 +1,15 @@
 import { FC, useEffect } from "react"
-import { Button, Col, Row, Space } from "antd"
+import { Button, Col, Flex, Row, Space, Typography } from "antd"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
+import * as diff from "fast-array-diff"
 
 import GenealogyTree from "./GenealogyTree"
 import PersonEditor from "./PersonEditor"
 import useGenealogyTreeEditorStore from "../store/useGenealogyTreeEditorStore"
 import { MODULE_ADDRESS, getAllPersonMetadata, getAllPersonRelation } from "../contract"
 import { getAptosClient } from "../../../common/aptosClient"
-import * as diff from "fast-array-diff"
 
+const { Text } = Typography;
 
 const aptos = getAptosClient()
 
@@ -25,7 +26,7 @@ const GenealogyTreeEditor: FC = () => {
     Promise.all([
       getAllPersonMetadata(),
       getAllPersonRelation(),
-    ]).then(([ person, relation ]) => setDataFromOnChain(person, relation))
+    ]).then(([person, relation]) => setDataFromOnChain(person, relation))
   }, [])
 
   function exportClickHandler() {
@@ -78,12 +79,17 @@ const GenealogyTreeEditor: FC = () => {
 
   return (
     <Row className="h-full">
-      <Col className="h-full overflow-auto no-scrollbar" span={6}>
-        <Space className="p-2">
-          <Button onClick={exportClickHandler}>Export</Button>
-          <Button onClick={saveClickHandler}>Save</Button>
-        </Space>
-        <PersonEditor edges={edges} nodes={nodes} />
+      <Col className="h-full" span={6}>
+        <Flex className="bg-blue-100 p-3" align="center" justify="space-between">
+          <Text strong>LOH Family</Text>
+          <Flex gap="small" align="center">
+            <Button onClick={exportClickHandler}>Export</Button>
+            <Button onClick={saveClickHandler}>Save</Button>
+          </Flex>
+        </Flex>
+        <div className="h-full overflow-auto no-scrollbar">
+          <PersonEditor edges={edges} nodes={nodes} />
+        </div>
       </Col>
       <Col span={18}>
         <GenealogyTree edges={edges} nodes={nodes} />
