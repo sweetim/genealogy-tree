@@ -150,6 +150,23 @@ module genealogy_tree::contract {
         })
     }
 
+    public entry fun mint_person_nft(user: &signer, person_id: String) acquires PersonMetadataDirectory {
+        let user_address = signer::address_of(user);
+
+        let person_metadata_directory = borrow_global_mut<PersonMetadataDirectory>(get_genealogy_tree_address());
+        let person_metadata = smart_table::borrow(&person_metadata_directory.person, person_id);
+
+        genealogy_tree::nft::mint(
+            user_address,
+            person_metadata.id,
+            person_metadata.name,
+            person_metadata.gender,
+            person_metadata.date_of_birth,
+            person_metadata.date_of_death,
+            person_metadata.image_uri,
+        );
+    }
+
     public entry fun create_person_relation(
         user: &signer,
         source: String,
