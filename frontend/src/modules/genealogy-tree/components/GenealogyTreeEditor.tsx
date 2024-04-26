@@ -1,5 +1,5 @@
 import { FC, useEffect } from "react"
-import { Button, Col, Flex, Row, Space, Typography } from "antd"
+import { Button, Col, Flex, Row, Typography } from "antd"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import * as diff from "fast-array-diff"
 
