@@ -82,11 +82,11 @@ const GenealogyTreeEditor: FC = () => {
       <Col className="h-full" span={6}>
         <Flex className="h-full" vertical>
           <Flex className="bg-blue-100 p-3" align="center" justify="space-between">
-            <Text strong>LOH Family</Text>
-            <Flex gap="small" align="center">
+            {nodes.length > 0 && <Text strong>LOH Family</Text>}
+            {account && <Flex gap="small" align="center">
               <Button onClick={exportClickHandler}>Export</Button>
               <Button onClick={saveClickHandler}>Save</Button>
-            </Flex>
+            </Flex>}
           </Flex>
           <div className="h-full overflow-auto no-scrollbar">
             <PersonEditor edges={edges} nodes={nodes} />
@@ -94,7 +94,7 @@ const GenealogyTreeEditor: FC = () => {
         </Flex>
       </Col>
       <Col span={18}>
-        <GenealogyTree edges={edges} nodes={nodes} />
+        {nodes.length > 0 && <GenealogyTree edges={edges} nodes={nodes} />}
       </Col>
     </Row>
   )

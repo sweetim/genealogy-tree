@@ -74,7 +74,7 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
   }
 
   return (
-    <Form {...formItemLayout} variant="outlined"
+    <Form {...formItemLayout} variant="outlined" disabled={!account}
       name={`updatePersonForm-${metadata.name}`}
       onFinish={updatePersonUpdateFinishHandler}
       initialValues={initialValues}>
@@ -101,14 +101,14 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
         <DatePicker />
       </Form.Item>
       <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
-        <Space >
+        {account && <Space >
           <Button type="primary" htmlType="submit">
             Update
           </Button>
           <Button type="primary" danger htmlType="button" onClick={claimNFTClickHandler}>
             Claim NFT
           </Button>
-        </Space>
+        </Space>}
       </Form.Item>
     </Form>
   )
