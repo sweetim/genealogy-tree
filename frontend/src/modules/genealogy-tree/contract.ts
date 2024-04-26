@@ -31,7 +31,7 @@ export type PersonRelationOnChain = {
   target: string
 }
 
-export const MODULE_ADDRESS = "0x8a9ed86121cbf83a25d1d3c90c15e2ffde05b2448b4fbee0dcc6e576a8528ce9"
+export const MODULE_ADDRESS = "0x9745f65c2d056411f4c29bd6f0b4596016b835667f18d2e2cf908d7969f6762a"
 
 const aptos = getAptosClient()
 
