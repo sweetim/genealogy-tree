@@ -80,16 +80,18 @@ const GenealogyTreeEditor: FC = () => {
   return (
     <Row className="h-full">
       <Col className="h-full" span={6}>
-        <Flex className="bg-blue-100 p-3" align="center" justify="space-between">
-          <Text strong>LOH Family</Text>
-          <Flex gap="small" align="center">
-            <Button onClick={exportClickHandler}>Export</Button>
-            <Button onClick={saveClickHandler}>Save</Button>
+        <Flex className="h-full" vertical>
+          <Flex className="bg-blue-100 p-3" align="center" justify="space-between">
+            <Text strong>LOH Family</Text>
+            <Flex gap="small" align="center">
+              <Button onClick={exportClickHandler}>Export</Button>
+              <Button onClick={saveClickHandler}>Save</Button>
+            </Flex>
           </Flex>
+          <div className="h-full overflow-auto no-scrollbar">
+            <PersonEditor edges={edges} nodes={nodes} />
+          </div>
         </Flex>
-        <div className="h-full overflow-auto no-scrollbar">
-          <PersonEditor edges={edges} nodes={nodes} />
-        </div>
       </Col>
       <Col span={18}>
         <GenealogyTree edges={edges} nodes={nodes} />
