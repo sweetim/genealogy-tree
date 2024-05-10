@@ -3,19 +3,22 @@ import { Card } from "antd"
 import Meta from "antd/lib/card/Meta"
 
 import { GenealogyTreeMetadata } from "@/contract"
+import Link from "next/link"
 
 const CollectionCard: FC<GenealogyTreeMetadata> = (props) => {
   return (
-    <Card
-      hoverable
-      cover={
-        <img alt={props.description}
-          src={props.uri} />
-      }
-    >
-      <Meta title={props.name}
-        description={props.description} />
-    </Card>
+    <Link href={`/family/${encodeURIComponent(props.name)}`}>
+      <Card
+        hoverable
+        cover={
+          <img alt={props.description}
+            src={props.uri} />
+        }
+      >
+        <Meta title={props.name}
+          description={props.description} />
+      </Card>
+    </Link>
   )
 }
 

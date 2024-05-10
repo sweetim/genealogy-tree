@@ -2,13 +2,13 @@
 
 import GenealogyTreeEditor from "@/modules/genealogy-tree/components/GenealogyTreeEditor";
 
-type CollectionPageProps = {
+type GenealogyTreePageProps = {
   params: {
     id: string
   }
 }
 
-export default function CollectionPage({ params }: CollectionPageProps) {
+export default function CollectionPage({ params }: GenealogyTreePageProps) {
   return (
     <GenealogyTreeEditor />
   )
