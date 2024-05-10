@@ -14,6 +14,11 @@ const antThemeConfig: ThemeConfig = {
   token: {
     fontFamily: "mali",
   },
+  components: {
+    Layout: {
+      bodyBg: "white"
+    },
+  }
 }
 
 export const metadata: Metadata = {
@@ -27,8 +32,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body className={mali.className}>
+    <html lang="en" className="h-full">
+      <body className={`${mali.className} h-full`}>
         <ConfigProvider theme={antThemeConfig}>
           <AntdRegistry>{children}</AntdRegistry>
         </ConfigProvider>

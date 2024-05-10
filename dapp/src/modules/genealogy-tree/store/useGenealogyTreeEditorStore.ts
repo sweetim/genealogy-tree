@@ -18,7 +18,7 @@ interface GenealogyTreeEditorStore {
 
 const useGenealogyTreeEditorStore = create<GenealogyTreeEditorStore>()(
   immer(
-    (set, _get) => ({
+    (set) => ({
       nodes: [],
       nodesFromOnChain: [],
       edges: [],
