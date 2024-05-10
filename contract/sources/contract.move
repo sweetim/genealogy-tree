@@ -45,13 +45,11 @@ module genealogy_tree::contract {
         description: String,
     }
 
-    #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
     struct GenealogyTree has key, store {
         metadata: GenealogyTreeMetadata,
         person: SmartTable<String, Person>
     }
 
-    #[resource_group_member(group = aptos_framework::object::ObjectGroup)]
     struct GenealogyTreeCollection has key, store {
         tree: vector<GenealogyTree>,
         mapping: SmartTable<String, u64>,
