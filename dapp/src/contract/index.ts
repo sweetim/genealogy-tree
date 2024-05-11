@@ -1,7 +1,7 @@
 import { getAptosClient } from "@/common/aptosClient"
 import { v4 as uuidv4 } from "uuid";
 
-export const MODULE_ADDRESS = "0x14cfffb3e4a3d95d4bc20ffc667ad9dd6560fc56539457014bae9d5900815e72"
+export const MODULE_ADDRESS = "0xcdeffa5e9a110d56e0f3fb377bfbfdb0d1df866933d2ef2110502d038b90a4a4"
 
 export enum PersonGender {
   Male = 1,
