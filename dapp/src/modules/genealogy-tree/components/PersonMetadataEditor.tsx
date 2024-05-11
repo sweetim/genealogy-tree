@@ -1,11 +1,12 @@
 import { FC } from "react"
 import dayjs, { Dayjs } from "dayjs"
 import { Button, DatePicker, Form, Input, Radio, Space } from "antd"
-import { PersonGender, PersonMetadata } from "../model"
-import useGenealogyTreeEditorStore from "../store/useGenealogyTreeEditorStore"
-import { getAptosClient } from "../../../common/aptosClient"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
+
+import { getAptosClient } from "../../../common/aptosClient"
 import { MODULE_ADDRESS } from "../contract"
+import useGTEditorStore from "../store/useGTEditorStore"
+import { PersonGender, PersonMetadata, getDefaultPersonMetadata } from "@/contract"
 
 export type PersonMetadataEditorProps = {
   id: string,
@@ -16,7 +17,7 @@ type PersonMetadataEditorForm = {
   id: string,
   name: string,
   gender: number,
-  dateOfBirth: Dayjs,
+  dateOfBirth: Dayjs | null,
   dateOfDeath: Dayjs | null,
 }
 
@@ -27,7 +28,7 @@ const aptos = getAptosClient()
 const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) => {
   const { signAndSubmitTransaction, account } = useWallet()
 
-  const updatePerson = useGenealogyTreeEditorStore((state) => state.updatePerson)
+  const updateNode = useGTEditorStore((state) => state.updateNode)
 
   const formItemLayout = {
     labelCol: {
@@ -41,14 +42,18 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
   };
 
   const updatePersonUpdateFinishHandler = (values: PersonMetadataEditorForm) => {
-    const dateOfDeath = values.dateOfDeath
-      ? dayjs(values.dateOfDeath).format(DATE_FORMAT)
+    const { dateOfBirth, dateOfDeath, ...others } = values
+
+    const date_of_death = dateOfDeath
+      ? dayjs(dateOfDeath).format(DATE_FORMAT)
       : ""
 
-    updatePerson(id, {
-      ...values,
-      dateOfBirth: dayjs(values.dateOfBirth).format(DATE_FORMAT),
-      dateOfDeath,
+    updateNode(id, {
+      ...getDefaultPersonMetadata(),
+      ...others,
+      id,
+      date_of_birth: dayjs(dateOfBirth).format(DATE_FORMAT),
+      date_of_death
     })
   }
 
@@ -70,8 +75,8 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
     id,
     name: metadata.name || "",
     gender: metadata.gender || 0,
-    dateOfBirth: dayjs(metadata.dateOfBirth),
-    dateOfDeath: metadata.dateOfDeath ? dayjs(metadata.dateOfDeath) : null,
+    dateOfBirth: metadata.date_of_birth.length === 0 ? null : dayjs(metadata.date_of_birth),
+    dateOfDeath: metadata.date_of_death.length === 0 ? null : dayjs(metadata.date_of_death),
   }
 
   return (

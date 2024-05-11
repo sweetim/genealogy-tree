@@ -3,7 +3,7 @@ import { Edge, Node } from "reactflow";
 import { Person, PersonMetadata } from "@/contract";
 
 export type EditorNodeProps<T> = {
-  isClick: boolean,
+  isNew: boolean,
   onChainData: T
 }
 
@@ -25,7 +25,7 @@ export function convertOnChainDataToEditorState(person: Person[]): GenealogyTree
       y: 0
     },
     data: {
-      isClick: false,
+      isNew: false,
       onChainData: p.metadata
     }
   }))

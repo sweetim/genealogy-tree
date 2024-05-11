@@ -60,7 +60,7 @@ const gtEditorState: GenealogyTreeEditorState = {
         y: 0
       },
       data: {
-        isClick: false,
+        isNew: false,
         onChainData: {
           index: 0,
           id: "0",
@@ -80,7 +80,7 @@ const gtEditorState: GenealogyTreeEditorState = {
         y: 0
       },
       data: {
-        isClick: false,
+        isNew: false,
         onChainData: {
           index: 1,
           id: "1",
@@ -100,7 +100,7 @@ const gtEditorState: GenealogyTreeEditorState = {
         y: 0
       },
       data: {
-        isClick: false,
+        isNew: false,
         onChainData: {
           index: 2,
           id: "2",

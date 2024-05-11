@@ -37,6 +37,7 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
       getAllPersonInCollection(collectionId),
       getCollectionById(collectionId)
     ]).then(([person, collection]) => {
+      console.log(person)
       setAllPerson(person)
       setCollectionMetadata(collection)
       updateFromOnChainData()
@@ -57,9 +58,9 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
     })
 
     const { added } = diff.diff(person, currentEditorState)
-
+    console.log(added)
     const batchUpsertPersonArgs = convertOnChainDataToBatchUpsertPersonArgs(added)
-
+    console.log(batchUpsertPersonArgs)
     const response = await signAndSubmitTransaction({
       sender: account?.address,
       data: {
@@ -88,7 +89,6 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
       <Col className="h-full" span={6}>
         <Flex className="h-full" vertical>
           <Flex className="bg-blue-100 p-0" align="center" justify="space-between">
-            {/* <Text strong>{collectionMetadata.name}</Text> */}
             <Card
               styles={{
                 body: { padding: "0" },
@@ -97,7 +97,7 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
               cover={
                 <img
                   className="rounded-none"
-                  alt="example"
+                  alt=""
                   src={collectionMetadata.uri}
                 />
               }
@@ -120,7 +120,7 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
         </Flex>
       </Col>
       <Col span={18}>
-        {nodes.length > 0 && <GenealogyTree edges={edges} nodes={nodes} />}
+        <GenealogyTree edges={edges} nodes={nodes} />
       </Col>
     </Row>
   )

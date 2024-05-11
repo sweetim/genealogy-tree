@@ -1,11 +1,12 @@
 "use client"
 
-import { FC, useEffect, useState } from "react"
+import { FC, useEffect, useMemo, useState } from "react"
 import { Collapse, CollapseProps } from "antd";
 import { Node, Edge } from "reactflow"
 
 import PersonMetadataEditor, { PersonMetadataEditorProps } from "./PersonMetadataEditor";
-import { EditorNodeProps, PersonMetadata } from "../model";
+import { EditorNodeProps } from "../model";
+import { PersonMetadata } from "@/contract";
 
 type PersonEditorProps = {
   nodes: Node<EditorNodeProps<PersonMetadata>>[],
@@ -24,6 +25,7 @@ const PersonEditor: FC<PersonEditorProps> = ({ nodes }) => {
 
       return {
         key: n.id,
+        isActive: n.data.isNew,
         label: n.data.onChainData.name,
         children: <PersonMetadataEditor {...editorProps} />,
       }
@@ -33,7 +35,9 @@ const PersonEditor: FC<PersonEditorProps> = ({ nodes }) => {
   }, [nodes])
 
   return (
-    <Collapse accordion
+    <Collapse
+      className="bg-red-600"
+      accordion
       expandIconPosition="end"
       items={items} />
   )

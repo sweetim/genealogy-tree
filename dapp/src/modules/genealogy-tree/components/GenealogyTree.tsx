@@ -8,9 +8,10 @@ import { v4 as uuidv4 } from "uuid";
 
 import 'reactflow/dist/style.css';
 
-import { EditorNodeProps, PersonMetadata } from "../model";
-import useGenealogyTreeEditorStore from "../store/useGenealogyTreeEditorStore";
+import { EditorNodeProps } from "../model";
 import PersonNode from "./PersonNode";
+import useGTEditorStore from "../store/useGTEditorStore";
+import { PersonMetadata } from "@/contract";
 
 type GenealogyTreeProps = {
   nodes: Node<EditorNodeProps<PersonMetadata>>[],
@@ -61,7 +62,8 @@ const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
 const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, edges: initialEdges }) => {
   const connectingNodeId = useRef<string | null>(null);
 
-  const addNewPerson = useGenealogyTreeEditorStore((state) => state.addNewPerson)
+  // const addNewPerson = useGenealogyTreeEditorStore((state) => state.addNewPerson)
+  const addNewNode = useGTEditorStore((state) => state.addNewNode)
 
   const { fitView, screenToFlowPosition, getNode } = useReactFlow();
 
@@ -116,7 +118,7 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
       const source = isAboveCurrentNode() ? id : connectingNodeId.current
       const target = isAboveCurrentNode() ? connectingNodeId.current : id
 
-      addNewPerson(
+      addNewNode(
         id,
         source,
         target,

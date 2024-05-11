@@ -31,12 +31,14 @@ const CreateCollectionForm: FC<CreateCollectionFormProps> = ({ className }) => {
   }
 
   const onFinish: FormProps<GenealogyTreeMetadata>['onFinish'] = async (values) => {
+    const id = uuidv4()
+
     const response = await signAndSubmitTransaction({
       sender: account?.address,
       data: {
         function: `${MODULE_ADDRESS}::contract::create_genealogy_tree_collection`,
         functionArguments: [
-          uuidv4(),
+          id,
           values.name,
           values.description,
           values.uri
@@ -46,7 +48,7 @@ const CreateCollectionForm: FC<CreateCollectionFormProps> = ({ className }) => {
 
     await aptos.waitForTransaction({ transactionHash: response.hash });
 
-    router.push("/")
+    router.push(`/family/${encodeURIComponent(id)}`)
   };
 
   const renderConnectUI = () => {

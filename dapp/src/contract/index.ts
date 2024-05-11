@@ -1,6 +1,12 @@
 import { getAptosClient } from "@/common/aptosClient"
+import { v4 as uuidv4 } from "uuid";
 
-export const MODULE_ADDRESS = "0xe67aa0314cb7fe09a36b8496d981f96d12f49cccc046cdb8e8a57ba7b640b503"
+export const MODULE_ADDRESS = "0x14cfffb3e4a3d95d4bc20ffc667ad9dd6560fc56539457014bae9d5900815e72"
+
+export enum PersonGender {
+  Male = 1,
+  Female
+}
 
 export type PersonMetadata = {
   index: number,
@@ -10,6 +16,18 @@ export type PersonMetadata = {
   date_of_birth: string,
   date_of_death: string,
   image_uri: string,
+}
+
+export function getDefaultPersonMetadata(): PersonMetadata {
+  return {
+    index: 0,
+    id: uuidv4(),
+    name: "",
+    gender: 0,
+    date_of_birth: new Date(Date.now()).toDateString(),
+    date_of_death: "",
+    image_uri: "",
+  }
 }
 
 export type PersonRelationship = {
