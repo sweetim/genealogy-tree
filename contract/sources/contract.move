@@ -18,6 +18,7 @@ module genealogy_tree::contract {
     use genealogy_tree::nft::init_module_for_testing;
 
     const E_BATCH_VEC_ARGS_LENGTH_NOT_EQUAL: u64 = 1;
+    const E_COLLECTION_ID_EXIST: u64 = 2;
 
     struct PersonMetadata has key, store, drop, copy {
         index: u64,
@@ -40,6 +41,7 @@ module genealogy_tree::contract {
     }
 
     struct GenealogyTreeMetadata has key, store, drop, copy {
+        id: String,
         name: String,
         uri: String,
         description: String,
@@ -81,15 +83,20 @@ module genealogy_tree::contract {
 
     public entry fun create_genealogy_tree_collection(
         user: &signer,
+        id: String,
         name: String,
         description: String,
         uri: String) acquires GenealogyTreeCollection
     {
         let gt_collection = borrow_global_mut<GenealogyTreeCollection>(@genealogy_tree);
 
+        let is_id_exist = smart_table::contains(&gt_collection.mapping, id);
+        assert!(is_id_exist != true, E_COLLECTION_ID_EXIST);
+
         let current_tree_index = vector::length(&gt_collection.tree);
         vector::push_back(&mut gt_collection.tree, GenealogyTree {
             metadata: GenealogyTreeMetadata {
+                id,
                 name,
                 description,
                 uri,
@@ -97,7 +104,7 @@ module genealogy_tree::contract {
             person: smart_table::new<String, Person>(),
         });
 
-        smart_table::upsert(&mut gt_collection.mapping, name, current_tree_index);
+        smart_table::add(&mut gt_collection.mapping, id, current_tree_index);
 
         genealogy_tree::nft::create_collection(
             user,
@@ -114,9 +121,9 @@ module genealogy_tree::contract {
     }
 
     #[view]
-    public fun get_collection_index_from(name: String): u64 acquires GenealogyTreeCollection {
+    public fun get_collection_index_from(id: String): u64 acquires GenealogyTreeCollection {
         let gt_collection = borrow_global<GenealogyTreeCollection>(@genealogy_tree);
-        *smart_table::borrow(&gt_collection.mapping, name)
+        *smart_table::borrow(&gt_collection.mapping, id)
     }
 
     #[view]
@@ -137,7 +144,7 @@ module genealogy_tree::contract {
 
     public entry fun upsert_person_metadata(
         user: &signer,
-        collection_name: String,
+        collection_id: String,
         id: String,
         name: String,
         gender: u8,
@@ -147,7 +154,7 @@ module genealogy_tree::contract {
         parent_ids: vector<String>,
         children_ids: vector<String>) acquires GenealogyTreeCollection
     {
-        let collection_index = get_collection_index_from(collection_name);
+        let collection_index = get_collection_index_from(collection_id);
 
         let gt_collection = borrow_global_mut<GenealogyTreeCollection>(@genealogy_tree);
         let gt = vector::borrow_mut(&mut gt_collection.tree, collection_index);
@@ -181,7 +188,7 @@ module genealogy_tree::contract {
 
     public entry fun batch_upsert_person_metadata(
         user: &signer,
-        collection_name: String,
+        collection_id: String,
         id: vector<String>,
         name: vector<String>,
         gender: vector<u8>,
@@ -215,7 +222,7 @@ module genealogy_tree::contract {
 
             upsert_person_metadata(
                 user,
-                collection_name,
+                collection_id,
                 *id,
                 *name,
                 *gender,
@@ -290,6 +297,7 @@ module genealogy_tree::contract {
 
         create_genealogy_tree_collection(
             user_1,
+            string::utf8(b"id"),
             string::utf8(b"collection_name"),
             string::utf8(b"description"),
             string::utf8(b"uri")
@@ -302,6 +310,36 @@ module genealogy_tree::contract {
 
         let event_length = vector::length(&emitted_events<GenealogyTreeCollectionCreatedEvent>());
         assert!(event_length == 1, 3);
+    }
+
+
+    #[test(framework = @0x1, user_1 = @0x123)]
+    #[expected_failure(abort_code = E_COLLECTION_ID_EXIST, location = Self)]
+    public fun test_create_genealogy_tree_collection_id_exist(framework: &signer, user_1: &signer) acquires GenealogyTreeCollection {
+        timestamp::set_time_has_started_for_testing(framework);
+
+        let owner = &account::create_account_for_test(@genealogy_tree);
+
+        account::create_account_for_test(signer::address_of(user_1));
+
+        init_module(owner);
+        init_module_for_testing(owner);
+
+        create_genealogy_tree_collection(
+            user_1,
+            string::utf8(b"id"),
+            string::utf8(b"collection_name"),
+            string::utf8(b"description"),
+            string::utf8(b"uri")
+        );
+
+        create_genealogy_tree_collection(
+            user_1,
+            string::utf8(b"id"),
+            string::utf8(b"collection_name"),
+            string::utf8(b"description"),
+            string::utf8(b"uri")
+        );
     }
 
     #[test(framework = @0x1, user_1 = @0x123, user_2 = @321)]
@@ -317,12 +355,14 @@ module genealogy_tree::contract {
 
         create_genealogy_tree_collection(
             user_1,
+            string::utf8(b"id_1"),
             string::utf8(b"collection_name 1"),
             string::utf8(b"description 1"),
             string::utf8(b"uri 1")
         );
         create_genealogy_tree_collection(
             user_2,
+            string::utf8(b"id_2"),
             string::utf8(b"collection_name 2"),
             string::utf8(b"description 2"),
             string::utf8(b"uri 2")
@@ -340,35 +380,38 @@ module genealogy_tree::contract {
 
         account::create_account_for_test(signer::address_of(user_1));
 
-        let collection_name_1 = string::utf8(b"collection_name_1");
-        let collection_name_2 = string::utf8(b"collection_name_2");
-        let collection_name_3 = string::utf8(b"collection_name_3");
+        let collection_id_1 = string::utf8(b"collection_id_1");
+        let collection_id_2 = string::utf8(b"collection_id_2");
+        let collection_id_3 = string::utf8(b"collection_id_3");
 
         init_module(owner);
         init_module_for_testing(owner);
 
         create_genealogy_tree_collection(
             user_1,
-            collection_name_1,
+            collection_id_1,
+            string::utf8(b"collection_name"),
             string::utf8(b"description"),
             string::utf8(b"uri")
         );
         create_genealogy_tree_collection(
             user_2,
-            collection_name_3,
+            collection_id_3,
+            string::utf8(b"collection_name"),
             string::utf8(b"description"),
             string::utf8(b"uri")
         );
         create_genealogy_tree_collection(
             user_1,
-            collection_name_2,
+            collection_id_2,
+            string::utf8(b"collection_name"),
             string::utf8(b"description"),
             string::utf8(b"uri")
         );
 
-        assert!(get_collection_index_from(collection_name_1) == 0, 1);
-        assert!(get_collection_index_from(collection_name_3) == 1, 1);
-        assert!(get_collection_index_from(collection_name_2) == 2, 1);
+        assert!(get_collection_index_from(collection_id_1) == 0, 1);
+        assert!(get_collection_index_from(collection_id_3) == 1, 1);
+        assert!(get_collection_index_from(collection_id_2) == 2, 1);
     }
 
     #[test(framework = @0x1, user_1 = @0x123, user_2 = @321)]
@@ -379,22 +422,23 @@ module genealogy_tree::contract {
 
         account::create_account_for_test(signer::address_of(user_1));
 
-        let collection_name_1 = string::utf8(b"collection_name_1");
+        let collection_id_1 = string::utf8(b"collection_id_1");
 
         init_module(owner);
         init_module_for_testing(owner);
 
         create_genealogy_tree_collection(
             user_1,
-            collection_name_1,
+            collection_id_1,
+            string::utf8(b"collection_name_1"),
             string::utf8(b"description"),
             string::utf8(b"uri")
         );
 
         upsert_person_metadata(
             user_2,
-            collection_name_1,
-            string::utf8(b"id"),
+            collection_id_1,
+            string::utf8(b"person_id"),
             string::utf8(b"name"),
             PERSON_GENDER_FEMALE,
             string::utf8(b"date_of_birth"),
@@ -404,7 +448,7 @@ module genealogy_tree::contract {
             vector[],
         );
 
-        let collection_index = get_collection_index_from(collection_name_1);
+        let collection_index = get_collection_index_from(collection_id_1);
         let gt_collection = borrow_global<GenealogyTreeCollection>(@genealogy_tree);
         let gt = vector::borrow(&gt_collection.tree, collection_index);
         assert!(smart_table::length(&gt.person) == 1, 1);
@@ -423,14 +467,15 @@ module genealogy_tree::contract {
 
         account::create_account_for_test(signer::address_of(user_1));
 
-        let collection_name_1 = string::utf8(b"collection_name_1");
+        let collection_id_1 = string::utf8(b"collection_id_1");
 
         init_module(owner);
         init_module_for_testing(owner);
 
         create_genealogy_tree_collection(
             user_1,
-            collection_name_1,
+            collection_id_1,
+            string::utf8(b"collection_name_1"),
             string::utf8(b"description"),
             string::utf8(b"uri")
         );
@@ -439,7 +484,7 @@ module genealogy_tree::contract {
 
         upsert_person_metadata(
             user_2,
-            collection_name_1,
+            collection_id_1,
             person_id,
             string::utf8(b"name"),
             PERSON_GENDER_FEMALE,
@@ -452,7 +497,7 @@ module genealogy_tree::contract {
 
         upsert_person_metadata(
             user_1,
-            collection_name_1,
+            collection_id_1,
             person_id,
             string::utf8(b"name_user_1"),
             PERSON_GENDER_MALE,
@@ -465,7 +510,7 @@ module genealogy_tree::contract {
 
         upsert_person_metadata(
             user_2,
-            collection_name_1,
+            collection_id_1,
             person_id,
             string::utf8(b"name1"),
             PERSON_GENDER_MALE,
@@ -476,7 +521,7 @@ module genealogy_tree::contract {
             vector[],
         );
 
-        let collection_index = get_collection_index_from(collection_name_1);
+        let collection_index = get_collection_index_from(collection_id_1);
         let gt_collection = borrow_global<GenealogyTreeCollection>(@genealogy_tree);
         let gt = vector::borrow(&gt_collection.tree, collection_index);
         assert!(smart_table::length(&gt.person) == 1, 1);
@@ -484,7 +529,7 @@ module genealogy_tree::contract {
         let event_length = vector::length(&emitted_events<PersonMetadataPopulatedEvent>());
         assert!(event_length == 3, 2);
 
-        let person = get_person_by_id(collection_name_1, person_id);
+        let person = get_person_by_id(collection_id_1, person_id);
         assert!(person.metadata.name == string::utf8(b"name1"), 3);
         assert!(person.metadata.gender == PERSON_GENDER_MALE, 4);
     }
@@ -499,7 +544,7 @@ module genealogy_tree::contract {
 
         account::create_account_for_test(signer::address_of(user_1));
 
-        let collection_name_1 = string::utf8(b"collection_name_1");
+        let collection_id_1 = string::utf8(b"collection_id_1");
         let person_id_1 = string::utf8(b"person_id_1");
         let person_id_2 = string::utf8(b"person_id_2");
         let person_id_3 = string::utf8(b"person_id_3");
@@ -509,14 +554,15 @@ module genealogy_tree::contract {
 
         create_genealogy_tree_collection(
             user_1,
-            collection_name_1,
+            collection_id_1,
+            string::utf8(b"collection_name_1"),
             string::utf8(b"description"),
             string::utf8(b"uri")
         );
 
         upsert_person_metadata(
             user_2,
-            collection_name_1,
+            collection_id_1,
             person_id_1,
             string::utf8(b"name"),
             PERSON_GENDER_FEMALE,
@@ -529,7 +575,7 @@ module genealogy_tree::contract {
 
         upsert_person_metadata(
             user_1,
-            collection_name_1,
+            collection_id_1,
             person_id_2,
             string::utf8(b"name_user_1"),
             PERSON_GENDER_MALE,
@@ -542,7 +588,7 @@ module genealogy_tree::contract {
 
         upsert_person_metadata(
             user_2,
-            collection_name_1,
+            collection_id_1,
             person_id_3,
             string::utf8(b"name1"),
             PERSON_GENDER_MALE,
@@ -553,7 +599,7 @@ module genealogy_tree::contract {
             vector[],
         );
 
-        let collection_index = get_collection_index_from(collection_name_1);
+        let collection_index = get_collection_index_from(collection_id_1);
         let gt_collection = borrow_global<GenealogyTreeCollection>(@genealogy_tree);
         let gt = vector::borrow(&gt_collection.tree, collection_index);
         assert!(smart_table::length(&gt.person) == 3, 1);
@@ -561,15 +607,15 @@ module genealogy_tree::contract {
         let event_length = vector::length(&emitted_events<PersonMetadataPopulatedEvent>());
         assert!(event_length == 3, 2);
 
-        let person_1 = get_person_by_id(collection_name_1, person_id_1);
-        let person_2 = get_person_by_id(collection_name_1, person_id_2);
-        let person_3 = get_person_by_id(collection_name_1, person_id_3);
+        let person_1 = get_person_by_id(collection_id_1, person_id_1);
+        let person_2 = get_person_by_id(collection_id_1, person_id_2);
+        let person_3 = get_person_by_id(collection_id_1, person_id_3);
 
         assert!(person_1.metadata.index == 1, 3);
         assert!(person_2.metadata.index == 2, 4);
         assert!(person_3.metadata.index == 3, 5);
 
-        let all_person = get_all_person(collection_name_1);
+        let all_person = get_all_person(collection_id_1);
         assert!(vector::length(&all_person) == 3, 6);
     }
 
@@ -580,21 +626,22 @@ module genealogy_tree::contract {
         let owner = &account::create_account_for_test(@genealogy_tree);
         account::create_account_for_test(signer::address_of(user_1));
 
-        let collection_name = string::utf8(b"collection_name");
+        let collection_id = string::utf8(b"id");
 
         init_module(owner);
         init_module_for_testing(owner);
 
         create_genealogy_tree_collection(
             user_1,
-            collection_name,
+            collection_id,
+            string::utf8(b"collection_name"),
             string::utf8(b"description"),
             string::utf8(b"uri")
         );
 
         batch_upsert_person_metadata(
             user_1,
-            collection_name,
+            collection_id,
             vector[
                 string::utf8(b"id_a"),
                 string::utf8(b"id_b"),
@@ -640,15 +687,15 @@ module genealogy_tree::contract {
         let event_length = vector::length(&emitted_events<PersonMetadataPopulatedEvent>());
         assert!(event_length == 3, 2);
 
-        let all_person = get_all_person(collection_name);
+        let all_person = get_all_person(collection_id);
         assert!(vector::length(&all_person) == 3, 3);
 
-        let person_1 = get_person_by_id(collection_name, string::utf8(b"id_a"));
+        let person_1 = get_person_by_id(collection_id, string::utf8(b"id_a"));
 
         assert!(vector::length(&person_1.relationship.parent_ids) == 0, 4);
         assert!(vector::length(&person_1.relationship.children_ids) == 2, 5);
 
-        let person_3 = get_person_by_id(collection_name, string::utf8(b"id_c"));
+        let person_3 = get_person_by_id(collection_id, string::utf8(b"id_c"));
 
         assert!(vector::length(&person_3.relationship.parent_ids) == 1, 4);
         assert!(vector::length(&person_3.relationship.children_ids) == 1, 5);
@@ -669,6 +716,7 @@ module genealogy_tree::contract {
 
         create_genealogy_tree_collection(
             user_1,
+            string::utf8(b"id"),
             collection_name,
             string::utf8(b"description"),
             string::utf8(b"uri")
@@ -696,7 +744,7 @@ module genealogy_tree::contract {
 
         account::create_account_for_test(signer::address_of(user_1));
 
-        let collection_name_1 = string::utf8(b"collection_name_1");
+        let collection_id_1 = string::utf8(b"collection_id_1");
         let user_id_1 = string::utf8(b"user_id_1");
         let user_id_2 = string::utf8(b"user_id_2");
 
@@ -705,16 +753,17 @@ module genealogy_tree::contract {
 
         create_genealogy_tree_collection(
             user_1,
-            collection_name_1,
+            collection_id_1,
+            string::utf8(b"collection_name"),
             string::utf8(b"description"),
             string::utf8(b"uri")
         );
 
         upsert_person_metadata(
             user_1,
-            collection_name_1,
+            collection_id_1,
             user_id_1,
-            user_id_1,
+            string::utf8(b"name"),
             PERSON_GENDER_FEMALE,
             string::utf8(b"date_of_birth"),
             string::utf8(b"date_of_death"),
@@ -724,9 +773,9 @@ module genealogy_tree::contract {
         );
         upsert_person_metadata(
             user_2,
-            collection_name_1,
+            collection_id_1,
             user_id_2,
-            user_id_2,
+            string::utf8(b"name"),
             PERSON_GENDER_MALE,
             string::utf8(b"date_of_birth"),
             string::utf8(b"date_of_death"),
@@ -735,11 +784,11 @@ module genealogy_tree::contract {
             vector[ string::utf8(b"1") ],
         );
 
-        let person_user_1 = get_person_by_id(collection_name_1, user_id_1);
-        let person_user_2 = get_person_by_id(collection_name_1, user_id_2);
+        let person_user_1 = get_person_by_id(collection_id_1, user_id_1);
+        let person_user_2 = get_person_by_id(collection_id_1, user_id_2);
 
-        assert!(person_user_1.metadata.name == user_id_1, 1);
-        assert!(person_user_2.metadata.name == user_id_2, 2);
+        assert!(person_user_1.metadata.id == user_id_1, 1);
+        assert!(person_user_2.metadata.id == user_id_2, 2);
         assert!(person_user_2.relationship.children_ids == vector[ string::utf8(b"1") ], 3);
     }
 }

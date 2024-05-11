@@ -39,3 +39,13 @@ export async function getAllCollection(): Promise<GenealogyTreeMetadata[]> {
 
   return value
 }
+
+export async function getAllPersonInCollection(collectionName: string): Promise<Person[]> {
+  const [value] = await aptos.view<Person[][]>({
+    payload: {
+      function: `${MODULE_ADDRESS}::contract::get_all_person`,
+    }
+  })
+
+  return value
+}
