@@ -36,7 +36,6 @@ const PersonEditor: FC<PersonEditorProps> = ({ nodes }) => {
 
   return (
     <Collapse
-      className="bg-red-600"
       accordion
       expandIconPosition="end"
       items={items} />
