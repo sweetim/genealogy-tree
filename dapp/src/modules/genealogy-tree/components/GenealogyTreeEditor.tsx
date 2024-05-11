@@ -1,21 +1,21 @@
 "use client"
 
 import { FC, useEffect } from "react"
-import { Button, Col, Flex, Row, Typography } from "antd"
+import { Card, Col, Flex, Row } from "antd"
+import { ExportOutlined, SaveOutlined } from "@ant-design/icons"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import * as diff from "fast-array-diff"
 
 import GenealogyTree from "./GenealogyTree"
 import PersonEditor from "./PersonEditor"
-import useGenealogyTreeEditorStore from "../store/useGenealogyTreeEditorStore"
 import { MODULE_ADDRESS, getAllPersonInCollection, getCollectionById } from "@/contract"
 import { getAptosClient } from "@/common/aptosClient"
 import useGTEditorStore from "../store/useGTEditorStore"
 import { convertEditorStateToOnChainData, convertOnChainDataToBatchUpsertPersonArgs } from "../model"
 
-const { Text } = Typography;
-
 const aptos = getAptosClient()
+
+const { Meta } = Card;
 
 type GenealogyTreeEditorProps = {
   collectionId: string
@@ -57,6 +57,7 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
     })
 
     const { added } = diff.diff(person, currentEditorState)
+
     const batchUpsertPersonArgs = convertOnChainDataToBatchUpsertPersonArgs(added)
 
     const response = await signAndSubmitTransaction({
@@ -86,12 +87,32 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
     <Row className="h-full">
       <Col className="h-full" span={6}>
         <Flex className="h-full" vertical>
-          <Flex className="bg-blue-100 p-3" align="center" justify="space-between">
-            <Text strong>{collectionMetadata.name}</Text>
-            {account && <Flex gap="small" align="center">
-              <Button onClick={exportClickHandler}>Export</Button>
-              <Button onClick={saveClickHandler}>Save</Button>
-            </Flex>}
+          <Flex className="bg-blue-100 p-0" align="center" justify="space-between">
+            {/* <Text strong>{collectionMetadata.name}</Text> */}
+            <Card
+              styles={{
+                body: { padding: "0" },
+              }}
+              size="small"
+              cover={
+                <img
+                  className="rounded-none"
+                  alt="example"
+                  src={collectionMetadata.uri}
+                />
+              }
+              actions={!account ? [] :
+                [
+                  <SaveOutlined onClick={saveClickHandler} key="save" />,
+                  <ExportOutlined onClick={exportClickHandler} key="export" />,
+                ]
+              }
+            >
+              <Meta
+                title={collectionMetadata.name}
+                description={collectionMetadata.description}
+              />
+            </Card>
           </Flex>
           <div className="h-full overflow-auto no-scrollbar">
             <PersonEditor edges={edges} nodes={nodes} />

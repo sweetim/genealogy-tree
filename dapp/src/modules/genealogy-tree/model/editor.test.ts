@@ -153,12 +153,12 @@ test("convertOnChainDataToBatchUpsertPersonArgs", () => {
     gender: [
       1, 2, 2
     ],
-    data_of_birth: [
+    date_of_birth: [
       "1921-01-01",
       "1921-01-01",
       "1921-01-01"
     ],
-    data_of_death: [
+    date_of_death: [
       "", "", ""
     ],
     image_uri: [
