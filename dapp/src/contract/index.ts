@@ -1,6 +1,6 @@
 import { getAptosClient } from "@/common/aptosClient"
 
-export const MODULE_ADDRESS = "0xd61c0d45bb9379d6fa583bc659a3a36f1d8afc5b8418b2ee5a5ad93ee4a64a7e"
+export const MODULE_ADDRESS = "0xe67aa0314cb7fe09a36b8496d981f96d12f49cccc046cdb8e8a57ba7b640b503"
 
 export type PersonMetadata = {
   index: number,
@@ -23,6 +23,7 @@ export type Person = {
 }
 
 export type GenealogyTreeMetadata = {
+  id: string,
   name: string,
   uri: string,
   description: string
@@ -40,12 +41,29 @@ export async function getAllCollection(): Promise<GenealogyTreeMetadata[]> {
   return value
 }
 
-export async function getAllPersonInCollection(collectionName: string): Promise<Person[]> {
-  const [value] = await aptos.view<Person[][]>({
+export async function getCollectionById(collectionId: string): Promise<GenealogyTreeMetadata> {
+  const [value] = await aptos.view<GenealogyTreeMetadata[]>({
     payload: {
-      function: `${MODULE_ADDRESS}::contract::get_all_person`,
+      function: `${MODULE_ADDRESS}::contract::get_collection_by_id`,
+      functionArguments: [
+        collectionId
+      ]
     }
   })
 
   return value
 }
+
+export async function getAllPersonInCollection(collectionId: string): Promise<Person[]> {
+  const [value] = await aptos.view<Person[][]>({
+    payload: {
+      function: `${MODULE_ADDRESS}::contract::get_all_person`,
+      functionArguments: [
+        collectionId
+      ]
+    }
+  })
+
+  return value
+}
+

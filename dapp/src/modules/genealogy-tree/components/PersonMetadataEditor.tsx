@@ -26,6 +26,7 @@ const aptos = getAptosClient()
 
 const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) => {
   const { signAndSubmitTransaction, account } = useWallet()
+
   const updatePerson = useGenealogyTreeEditorStore((state) => state.updatePerson)
 
   const formItemLayout = {

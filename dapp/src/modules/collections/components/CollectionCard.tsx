@@ -7,7 +7,7 @@ import Link from "next/link"
 
 const CollectionCard: FC<GenealogyTreeMetadata> = (props) => {
   return (
-    <Link href={`/family/${encodeURIComponent(props.name)}`}>
+    <Link href={`/family/${encodeURIComponent(props.id)}`}>
       <Card
         hoverable
         cover={

@@ -4,10 +4,12 @@ import { WalletSelector } from "@aptos-labs/wallet-adapter-ant-design"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import { FC } from "react"
 import { Button, Form, FormProps, Input, Space } from "antd"
+import { useRouter } from "next/navigation"
+import { v4 as uuidv4 } from "uuid";
+
 import { GenealogyTreeMetadata } from "@/contract"
 import { MODULE_ADDRESS } from "@/contract"
 import { getAptosClient } from "@/common/aptosClient"
-import { useRouter } from "next/navigation"
 
 type CreateCollectionFormProps = {
   className?: string
@@ -34,6 +36,7 @@ const CreateCollectionForm: FC<CreateCollectionFormProps> = ({ className }) => {
       data: {
         function: `${MODULE_ADDRESS}::contract::create_genealogy_tree_collection`,
         functionArguments: [
+          uuidv4(),
           values.name,
           values.description,
           values.uri

@@ -120,10 +120,19 @@ module genealogy_tree::contract {
         });
     }
 
-    #[view]
-    public fun get_collection_index_from(id: String): u64 acquires GenealogyTreeCollection {
+    fun get_collection_index_from(id: String): u64 acquires GenealogyTreeCollection {
         let gt_collection = borrow_global<GenealogyTreeCollection>(@genealogy_tree);
         *smart_table::borrow(&gt_collection.mapping, id)
+    }
+
+    #[view]
+    public fun get_collection_by_id(id: String): GenealogyTreeMetadata acquires GenealogyTreeCollection {
+        let gt_index = get_collection_index_from(id);
+
+        let gt_collection = borrow_global<GenealogyTreeCollection>(@genealogy_tree);
+        let gt = vector::borrow(&gt_collection.tree, gt_index);
+
+        gt.metadata
     }
 
     #[view]
@@ -140,6 +149,7 @@ module genealogy_tree::contract {
         };
 
         output
+        // vector::map_ref<GenealogyTree, GenealogyTreeMetadata>(&gt_collection.tree, |gt| gt.metadata)
     }
 
     public entry fun upsert_person_metadata(
@@ -412,6 +422,48 @@ module genealogy_tree::contract {
         assert!(get_collection_index_from(collection_id_1) == 0, 1);
         assert!(get_collection_index_from(collection_id_3) == 1, 1);
         assert!(get_collection_index_from(collection_id_2) == 2, 1);
+    }
+
+    #[test(framework = @0x1, user_1 = @0x123, user_2 = @321)]
+    public fun test_get_collection_by_id(framework: &signer, user_1: &signer, user_2: &signer) acquires GenealogyTreeCollection {
+        timestamp::set_time_has_started_for_testing(framework);
+
+        let owner = &account::create_account_for_test(@genealogy_tree);
+
+        account::create_account_for_test(signer::address_of(user_1));
+
+        let collection_id_1 = string::utf8(b"collection_id_1");
+        let collection_id_2 = string::utf8(b"collection_id_2");
+        let collection_id_3 = string::utf8(b"collection_id_3");
+
+        init_module(owner);
+        init_module_for_testing(owner);
+
+        create_genealogy_tree_collection(
+            user_1,
+            collection_id_1,
+            string::utf8(b"collection_name"),
+            string::utf8(b"description"),
+            string::utf8(b"uri")
+        );
+        create_genealogy_tree_collection(
+            user_2,
+            collection_id_3,
+            string::utf8(b"collection_name"),
+            string::utf8(b"description"),
+            string::utf8(b"uri")
+        );
+        create_genealogy_tree_collection(
+            user_1,
+            collection_id_2,
+            string::utf8(b"collection_name"),
+            string::utf8(b"description"),
+            string::utf8(b"uri")
+        );
+
+        assert!(get_collection_by_id(collection_id_1).id == collection_id_1, 1);
+        assert!(get_collection_by_id(collection_id_2).id == collection_id_2, 1);
+        assert!(get_collection_by_id(collection_id_3).id == collection_id_3, 1);
     }
 
     #[test(framework = @0x1, user_1 = @0x123, user_2 = @321)]

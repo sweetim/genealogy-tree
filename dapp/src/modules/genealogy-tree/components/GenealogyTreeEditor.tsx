@@ -8,27 +8,44 @@ import * as diff from "fast-array-diff"
 import GenealogyTree from "./GenealogyTree"
 import PersonEditor from "./PersonEditor"
 import useGenealogyTreeEditorStore from "../store/useGenealogyTreeEditorStore"
-import { MODULE_ADDRESS, getAllPersonMetadata, getAllPersonRelation } from "../contract"
+import { MODULE_ADDRESS, getAllPersonInCollection, getCollectionById } from "@/contract"
 import { getAptosClient } from "@/common/aptosClient"
+import useGTEditorStore from "../store/useGTEditorStore"
 
 const { Text } = Typography;
 
 const aptos = getAptosClient()
 
-const GenealogyTreeEditor: FC = () => {
-  const nodes = useGenealogyTreeEditorStore((state) => state.nodes)
+type GenealogyTreeEditorProps = {
+  collectionId: string
+}
+
+const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => {
   const nodesFromOnChain = useGenealogyTreeEditorStore((state) => state.nodesFromOnChain)
-  const edges = useGenealogyTreeEditorStore((state) => state.edges)
   const edgesFromOnChain = useGenealogyTreeEditorStore((state) => state.edgesFromOnChain)
   const setDataFromOnChain = useGenealogyTreeEditorStore((state) => state.setDataFromOnChain)
 
-  const { signAndSubmitTransaction, account } = useWallet();
+  const collectionMetadata = useGTEditorStore(state => state.collectionMetadata)
+  const setCollectionMetadata = useGTEditorStore((state) => state.setCollectionMetadata)
+  const setAllPerson = useGTEditorStore((state) => state.setAllPerson)
+  const nodes = useGTEditorStore((state) => state.nodes)
+  const edges = useGTEditorStore((state) => state.edges)
+
+const { signAndSubmitTransaction, account } = useWallet();
 
   useEffect(() => {
     Promise.all([
-      getAllPersonMetadata(),
-      getAllPersonRelation(),
-    ]).then(([person, relation]) => setDataFromOnChain(person, relation))
+      getAllPersonInCollection(collectionId),
+      getCollectionById(collectionId)
+    ]).then(([ person, collection ]) => {
+      setAllPerson(person)
+      setCollectionMetadata(collection)
+    })
+
+    // Promise.all([
+    //   getAllPersonMetadata(),
+    //   getAllPersonRelation(),
+    // ]).then(([person, relation]) => setDataFromOnChain(person, relation))
   }, [])
 
   function exportClickHandler() {
@@ -51,8 +68,8 @@ const GenealogyTreeEditor: FC = () => {
             node.id,
             node.data.name,
             node.data.gender,
-            node.data.dateOfBirth,
-            node.data.dateOfDeath,
+            node.data.date_of_birth,
+            node.data.date_of_death,
             `https://robohash.org/${node.data.name}?set=set1`
           ],
         },
@@ -84,7 +101,7 @@ const GenealogyTreeEditor: FC = () => {
       <Col className="h-full" span={6}>
         <Flex className="h-full" vertical>
           <Flex className="bg-blue-100 p-3" align="center" justify="space-between">
-            {nodes.length > 0 && <Text strong>LOH Family</Text>}
+            {nodes.length > 0 && <Text strong>{collectionMetadata.name}</Text>}
             {account && <Flex gap="small" align="center">
               <Button onClick={exportClickHandler}>Export</Button>
               <Button onClick={saveClickHandler}>Save</Button>

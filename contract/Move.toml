@@ -4,7 +4,7 @@ version = "1.0.0"
 authors = []
 
 [addresses]
-genealogy_tree = "0xd61c0d45bb9379d6fa583bc659a3a36f1d8afc5b8418b2ee5a5ad93ee4a64a7e"
+genealogy_tree = "0xe67aa0314cb7fe09a36b8496d981f96d12f49cccc046cdb8e8a57ba7b640b503"
 
 [dev-addresses]
 

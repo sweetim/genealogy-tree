@@ -1,5 +1,3 @@
-"use client"
-
 import GenealogyTreeEditor from "@/modules/genealogy-tree/components/GenealogyTreeEditor";
 
 type GenealogyTreePageProps = {
@@ -10,6 +8,6 @@ type GenealogyTreePageProps = {
 
 export default function CollectionPage({ params }: GenealogyTreePageProps) {
   return (
-    <GenealogyTreeEditor />
+    <GenealogyTreeEditor collectionId={params.id} />
   )
 }
