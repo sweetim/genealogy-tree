@@ -1,14 +1,20 @@
-import { GenealogyTreeMetadata, Person, PersonMetadata } from "@/contract";
-import { Edge, Node } from "reactflow";
-import { StateCreator, create } from "zustand";
+import { StateCreator, StoreMutatorIdentifier, create } from "zustand";
 import { immer } from "zustand/middleware/immer";
 
-type ImmerStateCreator<T> = StateCreator<
+import { GenealogyTreeMetadata, Person, PersonMetadata } from "@/contract";
+import { GenealogyTreeEditorState, convertOnChainDataToEditorState } from "../model";
+
+export type ImmerStateCreator<
   T,
-  [["zustand/immer", never], never],
-  [],
-  T
->;
+  Mps extends [StoreMutatorIdentifier, unknown][] = [],
+  Mcs extends [StoreMutatorIdentifier, unknown][] = [],
+> = StateCreator<T, [...Mps, ['zustand/immer', never]], Mcs>;
+
+type GTEditorStateCreator = ImmerStateCreator<GTEditorStore>;
+
+type GTEditorSliceCreator<TSlice extends keyof GTEditorStore> = (
+  ...params: Parameters<GTEditorStateCreator>
+) => Pick<ReturnType<GTEditorStateCreator>, TSlice>;
 
 type GenealogyTreeOnChainDataState = {
   collectionMetadata: GenealogyTreeMetadata,
@@ -22,7 +28,7 @@ type GenealogyTreeOnChainDataAction = {
 
 type GenealogyTreeOnChainDataSlice = GenealogyTreeOnChainDataState & GenealogyTreeOnChainDataAction
 
-const genealogyTreeOnChainDataSlice: ImmerStateCreator<GenealogyTreeOnChainDataSlice> = (set, get) => ({
+const genealogyTreeOnChainDataSlice: GTEditorSliceCreator<keyof GenealogyTreeOnChainDataSlice> = (set, get) => ({
   collectionMetadata: {
     id: "",
     description: "",
@@ -35,28 +41,30 @@ const genealogyTreeOnChainDataSlice: ImmerStateCreator<GenealogyTreeOnChainDataS
       state.collectionMetadata = data
     }),
   setAllPerson: (data) =>
-      set((state) => {
-        state.person = data
-      })
+    set((state) => {
+      state.person = data
+    })
 })
 
-type GenealogyTreeEditorState = {
-  nodes: Node<PersonMetadata>[],
-  edges: Edge[],
-}
-
 type GenealogyTreeEditorAction = {
-
+  updateFromOnChainData: () => void
 }
 
 type GenealogyTreeEditorSlice = GenealogyTreeEditorState & GenealogyTreeEditorAction
 
-const genealogyTreeEditorSlice: ImmerStateCreator<GenealogyTreeEditorSlice> = (set) => ({
+const genealogyTreeEditorSlice: GTEditorSliceCreator<keyof GenealogyTreeEditorSlice> = (set, get) => ({
   nodes: [],
   edges: [],
+  updateFromOnChainData: () =>
+    set((state) => {
+      const { edges, nodes } = convertOnChainDataToEditorState(state.person)
+
+      state.nodes = nodes
+      state.edges = edges
+    })
 })
 
-type GTEditorStore = GenealogyTreeOnChainDataSlice & GenealogyTreeEditorState
+type GTEditorStore = GenealogyTreeOnChainDataSlice & GenealogyTreeEditorSlice
 
 const useGTEditorStore = create<GTEditorStore>()(
   immer((...args) => ({
@@ -66,3 +74,4 @@ const useGTEditorStore = create<GTEditorStore>()(
 )
 
 export default useGTEditorStore
+

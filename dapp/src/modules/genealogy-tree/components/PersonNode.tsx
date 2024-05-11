@@ -4,17 +4,18 @@ import { Handle, NodeProps, Position } from "reactflow";
 import { FC } from "react";
 import { Avatar, Flex, Skeleton, Typography } from "antd";
 
-import { PersonMetadata } from "../model";
+import { EditorNodeProps } from "../model";
+import { PersonMetadata } from "@/contract";
 
 const { Text } = Typography;
 
-const PersonNode: FC<NodeProps<PersonMetadata>> = ({ data, isConnectable }) => {
-  const isNewPerson = data.name?.includes("NEW Person")
+const PersonNode: FC<NodeProps<EditorNodeProps<PersonMetadata>>> = ({ data, isConnectable }) => {
+  const isNewPerson = data.onChainData.name?.includes("NEW Person")
 
-  const imageUri = `https://robohash.org/${data.name}?set=set1`
-  const yearOfBirth = (new Date(data.dateOfBirth || Date.now())).getFullYear()
-  const yearOfDeath = data.dateOfDeath
-    ? (new Date(data.dateOfDeath)).getFullYear()
+  const imageUri = `https://robohash.org/${data.onChainData.name}?set=set1`
+  const yearOfBirth = (new Date(data.onChainData.date_of_birth || Date.now())).getFullYear()
+  const yearOfDeath = data.onChainData.date_of_death
+    ? (new Date(data.onChainData.date_of_death)).getFullYear()
     : "living"
 
   const yearsOfLiving = `${yearOfBirth} - ${yearOfDeath}`
@@ -37,7 +38,7 @@ const PersonNode: FC<NodeProps<PersonMetadata>> = ({ data, isConnectable }) => {
         isConnectable={isConnectable} />
       <Flex align="center" justify='center' vertical className='h-full'>
         {renderAvatar}
-        <Text strong>{data.name} ({GENDER_TO_STRING[data.gender || 0] || ""})</Text>
+        <Text strong>{data.onChainData.name} ({data.onChainData.gender === 1 ? "M" : "F"})</Text>
         <Text type="secondary">{yearsOfLiving}</Text>
       </Flex>
       <Handle type="source"

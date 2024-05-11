@@ -11,3 +11,5 @@ export type PersonMetadata = {
   gender?: PersonGender,
   imageUri?: string,
 }
+
+export * from "./editor"

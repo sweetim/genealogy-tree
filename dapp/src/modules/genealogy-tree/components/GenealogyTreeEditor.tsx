@@ -11,6 +11,7 @@ import useGenealogyTreeEditorStore from "../store/useGenealogyTreeEditorStore"
 import { MODULE_ADDRESS, getAllPersonInCollection, getCollectionById } from "@/contract"
 import { getAptosClient } from "@/common/aptosClient"
 import useGTEditorStore from "../store/useGTEditorStore"
+import { convertEditorStateToOnChainData, convertOnChainDataToBatchUpsertPersonArgs } from "../model"
 
 const { Text } = Typography;
 
@@ -21,31 +22,25 @@ type GenealogyTreeEditorProps = {
 }
 
 const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => {
-  const nodesFromOnChain = useGenealogyTreeEditorStore((state) => state.nodesFromOnChain)
-  const edgesFromOnChain = useGenealogyTreeEditorStore((state) => state.edgesFromOnChain)
-  const setDataFromOnChain = useGenealogyTreeEditorStore((state) => state.setDataFromOnChain)
-
   const collectionMetadata = useGTEditorStore(state => state.collectionMetadata)
   const setCollectionMetadata = useGTEditorStore((state) => state.setCollectionMetadata)
   const setAllPerson = useGTEditorStore((state) => state.setAllPerson)
+  const updateFromOnChainData = useGTEditorStore((state) => state.updateFromOnChainData)
   const nodes = useGTEditorStore((state) => state.nodes)
   const edges = useGTEditorStore((state) => state.edges)
+  const person = useGTEditorStore((state) => state.person)
 
-const { signAndSubmitTransaction, account } = useWallet();
+  const { signAndSubmitTransaction, account } = useWallet();
 
   useEffect(() => {
     Promise.all([
       getAllPersonInCollection(collectionId),
       getCollectionById(collectionId)
-    ]).then(([ person, collection ]) => {
+    ]).then(([person, collection]) => {
       setAllPerson(person)
       setCollectionMetadata(collection)
+      updateFromOnChainData()
     })
-
-    // Promise.all([
-    //   getAllPersonMetadata(),
-    //   getAllPersonRelation(),
-    // ]).then(([person, relation]) => setDataFromOnChain(person, relation))
   }, [])
 
   function exportClickHandler() {
@@ -56,44 +51,35 @@ const { signAndSubmitTransaction, account } = useWallet();
   }
 
   async function saveClickHandler() {
-    const { added: addedNodes } = diff.diff(nodesFromOnChain, nodes)
-    const { added: addedEdges } = diff.diff(edgesFromOnChain, edges)
+    const currentEditorState = convertEditorStateToOnChainData({
+      nodes,
+      edges
+    })
 
-    for (const node of addedNodes) {
-      const response = await signAndSubmitTransaction({
-        sender: account?.address,
-        data: {
-          function: `${MODULE_ADDRESS}::contract::create_person_metadata`,
-          functionArguments: [
-            node.id,
-            node.data.name,
-            node.data.gender,
-            node.data.date_of_birth,
-            node.data.date_of_death,
-            `https://robohash.org/${node.data.name}?set=set1`
-          ],
-        },
-      });
+    const { added } = diff.diff(person, currentEditorState)
+    const batchUpsertPersonArgs = convertOnChainDataToBatchUpsertPersonArgs(added)
 
-      await aptos.waitForTransaction({ transactionHash: response.hash });
-    }
+    const response = await signAndSubmitTransaction({
+      sender: account?.address,
+      data: {
+        function: `${MODULE_ADDRESS}::contract::batch_upsert_person_metadata`,
+        functionArguments: [
+          collectionMetadata.id,
+          batchUpsertPersonArgs.id,
+          batchUpsertPersonArgs.name,
+          batchUpsertPersonArgs.gender,
+          batchUpsertPersonArgs.date_of_birth,
+          batchUpsertPersonArgs.date_of_death,
+          batchUpsertPersonArgs.image_uri,
+          batchUpsertPersonArgs.parent_ids,
+          batchUpsertPersonArgs.children_ids
+        ],
+      },
+    });
 
-    for (const edge of addedEdges) {
-      const response = await signAndSubmitTransaction({
-        sender: account?.address,
-        data: {
-          function: `${MODULE_ADDRESS}::contract::create_person_relation`,
-          functionArguments: [
-            edge.source,
-            edge.target
-          ],
-        },
-      });
+    await aptos.waitForTransaction({ transactionHash: response.hash });
 
-      await aptos.waitForTransaction({ transactionHash: response.hash });
-    }
-
-    console.log("save completed")
+    alert(`${added.length} new entries added`)
   }
 
   return (
@@ -101,7 +87,7 @@ const { signAndSubmitTransaction, account } = useWallet();
       <Col className="h-full" span={6}>
         <Flex className="h-full" vertical>
           <Flex className="bg-blue-100 p-3" align="center" justify="space-between">
-            {nodes.length > 0 && <Text strong>{collectionMetadata.name}</Text>}
+            <Text strong>{collectionMetadata.name}</Text>
             {account && <Flex gap="small" align="center">
               <Button onClick={exportClickHandler}>Export</Button>
               <Button onClick={saveClickHandler}>Save</Button>

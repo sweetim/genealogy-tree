@@ -8,12 +8,12 @@ import { v4 as uuidv4 } from "uuid";
 
 import 'reactflow/dist/style.css';
 
-import { PersonMetadata } from "../model";
+import { EditorNodeProps, PersonMetadata } from "../model";
 import useGenealogyTreeEditorStore from "../store/useGenealogyTreeEditorStore";
 import PersonNode from "./PersonNode";
 
 type GenealogyTreeProps = {
-  nodes: Node<PersonMetadata>[],
+  nodes: Node<EditorNodeProps<PersonMetadata>>[],
   edges: Edge[],
 }
 

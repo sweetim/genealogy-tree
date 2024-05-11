@@ -5,10 +5,10 @@ import { Collapse, CollapseProps } from "antd";
 import { Node, Edge } from "reactflow"
 
 import PersonMetadataEditor, { PersonMetadataEditorProps } from "./PersonMetadataEditor";
-import { PersonMetadata } from "../model";
+import { EditorNodeProps, PersonMetadata } from "../model";
 
 type PersonEditorProps = {
-  nodes: Node<PersonMetadata>[],
+  nodes: Node<EditorNodeProps<PersonMetadata>>[],
   edges: Edge[],
 }
 
@@ -19,12 +19,12 @@ const PersonEditor: FC<PersonEditorProps> = ({ nodes }) => {
     const itemNodes = nodes.map(n => {
       const editorProps: PersonMetadataEditorProps = {
         id: n.id,
-        metadata: n.data
+        metadata: n.data.onChainData
       }
 
       return {
         key: n.id,
-        label: n.data.name,
+        label: n.data.onChainData.name,
         children: <PersonMetadataEditor {...editorProps} />,
       }
     })

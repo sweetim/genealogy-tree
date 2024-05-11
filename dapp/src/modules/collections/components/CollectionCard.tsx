@@ -11,7 +11,8 @@ const CollectionCard: FC<GenealogyTreeMetadata> = (props) => {
       <Card
         hoverable
         cover={
-          <img alt={props.description}
+          <img
+            alt={props.description}
             src={props.uri} />
         }
       >
