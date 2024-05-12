@@ -3,10 +3,9 @@ import dayjs, { Dayjs } from "dayjs"
 import { Button, DatePicker, Form, Input, Radio, Space } from "antd"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 
-import { getAptosClient } from "../../../common/aptosClient"
-import { MODULE_ADDRESS } from "../contract"
+import { getAptosClient } from "@/common/aptosClient"
 import useGTEditorStore from "../store/useGTEditorStore"
-import { PersonGender, PersonMetadata, getDefaultPersonMetadata } from "@/contract"
+import { MODULE_ADDRESS, PersonGender, PersonMetadata, getDefaultPersonMetadata } from "@/contract"
 
 export type PersonMetadataEditorProps = {
   id: string,

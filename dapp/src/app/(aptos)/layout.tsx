@@ -31,7 +31,7 @@ export default function CollectionLayout({
             <WalletSelector />
           </Flex>
         </Header>
-        <Content className="h-full">
+        <Content className="h-full overflow-auto no-scrollbar">
           {children}
         </Content>
       </Layout>

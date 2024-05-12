@@ -88,7 +88,7 @@ const CreateCollectionForm: FC<CreateCollectionFormProps> = ({ className }) => {
             <Input />
           </Form.Item>
 
-          <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
+          <Form.Item wrapperCol={{ span: 24 }}>
             <Button type="primary" htmlType="submit">
               Create Your Family Tree
             </Button>

@@ -12,7 +12,11 @@ const CollectionGrid: FC<CollectionGridProps> = ({ className, data }) => {
   const renderCollectionCols = () => {
     return data.map(metadata => {
       return (
-        <Col key={metadata.id} className="gutter-row" span={6}>
+        <Col key={metadata.id}
+          className="gutter-row"
+          xs={{ flex: '100%' }}
+          sm={{ flex: '50%' }}
+          md={{ flex: '25%' }}>
           <CollectionCard {...metadata} />
         </Col>
       )

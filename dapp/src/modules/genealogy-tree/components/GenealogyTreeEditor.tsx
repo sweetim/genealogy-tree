@@ -58,9 +58,8 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
     })
 
     const { added } = diff.diff(person, currentEditorState)
-    console.log(added)
+
     const batchUpsertPersonArgs = convertOnChainDataToBatchUpsertPersonArgs(added)
-    console.log(batchUpsertPersonArgs)
     const response = await signAndSubmitTransaction({
       sender: account?.address,
       data: {
@@ -88,16 +87,14 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
     <Row className="h-full">
       <Col className="h-full" span={6}>
         <Flex className="h-full" vertical>
-          <Flex className="bg-blue-100 p-0" align="center" justify="space-between">
+          <Flex className="p-0" align="center" justify="space-between">
             <Card
-              styles={{
-                body: { padding: "0" },
-              }}
               size="small"
+              className="!rounded-none w-full"
               cover={
                 <img
-                  className="rounded-none"
-                  alt=""
+                  className="min-h-40 max-h-40 object-cover !rounded-none"
+                  alt="collection image"
                   src={collectionMetadata.uri}
                 />
               }
