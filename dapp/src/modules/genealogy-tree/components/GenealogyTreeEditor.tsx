@@ -1,7 +1,7 @@
 "use client"
 
 import { FC, useEffect, useState } from "react"
-import { Card, Col, Flex, Row } from "antd"
+import { Card, Col, Flex, Row, Button } from "antd"
 import { ExportOutlined, SaveOutlined } from "@ant-design/icons"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import Image from 'next/image'
@@ -120,8 +120,22 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
               }
               actions={!account ? [] :
                 [
-                  <SaveOutlined onClick={saveClickHandler} key="save" />,
-                  <ExportOutlined onClick={exportClickHandler} key="export" />,
+                  <Button block
+                    key="save"
+                    type="text"
+                    icon={<SaveOutlined />}
+                    iconPosition="start"
+                    onClick={saveClickHandler}>
+                    Save
+                  </Button>,
+                  <Button block
+                    key="export"
+                    type="text"
+                    icon={<ExportOutlined />}
+                    iconPosition="start"
+                    onClick={exportClickHandler}>
+                    Export
+                  </Button>,
                 ]
               }
             >

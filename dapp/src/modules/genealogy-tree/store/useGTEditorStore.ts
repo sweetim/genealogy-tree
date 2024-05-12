@@ -1,9 +1,8 @@
 import { StateCreator, StoreMutatorIdentifier, create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { v4 as uuidv4 } from "uuid";
 
 import { GenealogyTreeMetadata, Person, PersonMetadata } from "@/contract";
-import { GenealogyTreeEditorState, convertOnChainDataToEditorState } from "../model";
+import { GenealogyTreeEditorState, convertOnChainDataToEditorState, getDefaultNodes } from "../model";
 
 export type ImmerStateCreator<
   T,
@@ -55,34 +54,17 @@ type GenealogyTreeEditorAction = {
 
 type GenealogyTreeEditorSlice = GenealogyTreeEditorState & GenealogyTreeEditorAction
 
-const initialId = uuidv4()
 const genealogyTreeEditorSlice: GTEditorSliceCreator<keyof GenealogyTreeEditorSlice> = (set, get) => ({
-  nodes: [
-    {
-      id: initialId,
-      position: {
-        x: 0,
-        y: 0
-      },
-      data: {
-        isNew: false,
-        onChainData: {
-          index: 0,
-          id: initialId,
-          name: "you",
-          gender: 1,
-          date_of_birth: "",
-          date_of_death: "",
-          image_uri: "https://robohash.org/a?set=set1",
-        }
-      },
-      type: "personNode"
-    }
-  ],
+  nodes: getDefaultNodes(),
   edges: [],
   updateFromOnChainData: () =>
     set((state) => {
       const { edges, nodes } = convertOnChainDataToEditorState(state.person)
+
+      if (nodes.length === 0 && edges.length === 0) {
+        state.nodes = getDefaultNodes()
+        state.edges = []
+      }
 
       if (nodes.length > 0 && edges.length > 0) {
         state.nodes = nodes
@@ -91,7 +73,6 @@ const genealogyTreeEditorSlice: GTEditorSliceCreator<keyof GenealogyTreeEditorSl
     }),
   addNewNode: (id: string, source: string, target: string, mouse_x: number, mouse_y: number) =>
     set((state) => {
-      console.log("add", id)
       state.nodes.unshift({
         id,
         position: {

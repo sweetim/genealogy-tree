@@ -1,4 +1,5 @@
 import { Edge, Node } from "reactflow";
+import { v4 as uuidv4 } from "uuid";
 
 import { Person, PersonMetadata } from "@/contract";
 
@@ -10,6 +11,33 @@ export type EditorNodeProps<T> = {
 export type GenealogyTreeEditorState = {
   nodes: Node<EditorNodeProps<PersonMetadata>>[],
   edges: Edge[]
+}
+
+export function getDefaultNodes(): Node<EditorNodeProps<PersonMetadata>>[] {
+  const id = uuidv4()
+
+  return [
+    {
+      id,
+      position: {
+        x: 0,
+        y: 0
+      },
+      data: {
+        isNew: false,
+        onChainData: {
+          index: 0,
+          id,
+          name: "you",
+          gender: 1,
+          date_of_birth: "",
+          date_of_death: "",
+          image_uri: "https://robohash.org/a?set=set1",
+        }
+      },
+      type: "personNode"
+    }
+  ]
 }
 
 // edge definition - parents at the top of user and children is below
