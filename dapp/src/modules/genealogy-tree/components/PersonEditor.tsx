@@ -8,37 +8,51 @@ import PersonMetadataEditor, { PersonMetadataEditorProps } from "./PersonMetadat
 import { EditorNodeProps } from "../model";
 import { PersonMetadata } from "@/contract";
 
+const { Panel } = Collapse
+
 type PersonEditorProps = {
   nodes: Node<EditorNodeProps<PersonMetadata>>[],
   edges: Edge[],
 }
 
 const PersonEditor: FC<PersonEditorProps> = ({ nodes }) => {
-  const [items, setItems] = useState<CollapseProps['items']>([])
-
-  useEffect(() => {
-    const itemNodes = nodes.map(n => {
+  const renderPanels = useMemo(() => {
+    return nodes.map(n => {
       const editorProps: PersonMetadataEditorProps = {
         id: n.id,
         metadata: n.data.onChainData
       }
 
-      return {
-        key: n.id,
-        isActive: n.data.isNew,
-        label: n.data.onChainData.name,
-        children: <PersonMetadataEditor {...editorProps} />,
-      }
-    })
+      const className = n.data.isNew
+        ? "bg-orange-200"
+        : ""
 
-    setItems(itemNodes)
+      return (
+        <Panel key={n.id}
+          className={className}
+          header={n.data.onChainData.name}>
+          <PersonMetadataEditor {...editorProps} />
+        </Panel>
+      )
+    })
+  }, [nodes])
+
+  const activeKey = useMemo<string[] | undefined>(() => {
+    const newNodeKey = nodes.filter(n => n.data.isNew)
+      .map(n => n.data.onChainData.id)
+
+    return newNodeKey.length === 0
+      ? undefined
+      : newNodeKey
   }, [nodes])
 
   return (
     <Collapse
+      activeKey={activeKey}
       accordion
-      expandIconPosition="end"
-      items={items} />
+      expandIconPosition="end">
+      {renderPanels}
+    </Collapse>
   )
 }
 

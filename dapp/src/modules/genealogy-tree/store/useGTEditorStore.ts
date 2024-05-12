@@ -104,7 +104,10 @@ const genealogyTreeEditorSlice: GTEditorSliceCreator<keyof GenealogyTreeEditorSl
   updateNode: (id: string, person: PersonMetadata) =>
     set((state) => {
       const index = state.nodes.findIndex(n => n.id === id)
-      if (index !== -1) state.nodes[index].data.onChainData = person
+      if (index !== -1) {
+        state.nodes[index].data.isNew = false
+        state.nodes[index].data.onChainData = person
+      }
     })
 })
 

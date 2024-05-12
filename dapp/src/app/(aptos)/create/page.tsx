@@ -10,7 +10,7 @@ export default function CreatePage() {
         alt="family potrait"
         width={400}
         height={400} />
-      <div className="text-center">
+      <div className="text-center sm:w-full md:w-1/2 lg:w-1/3">
         <CreateCollectionForm />
       </div>
     </div>
