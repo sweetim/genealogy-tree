@@ -13,7 +13,7 @@ const CollectionGrid: FC<CollectionGridProps> = ({ className, data }) => {
     return data.map(metadata => {
       return (
         <Col key={metadata.id}
-          className="gutter-row"
+          className="gutter-row py-1"
           xs={{ flex: '100%' }}
           sm={{ flex: '50%' }}
           md={{ flex: '25%' }}>

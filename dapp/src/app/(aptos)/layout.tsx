@@ -21,7 +21,7 @@ export default function CollectionLayout({
   return (
     <AptosWalletAdapterProvider plugins={wallets} autoConnect={true}>
       <Layout className="h-screen">
-        <Header>
+        <Header className="!p-3">
           <Flex className="h-full"
             justify="space-between"
             align="center">

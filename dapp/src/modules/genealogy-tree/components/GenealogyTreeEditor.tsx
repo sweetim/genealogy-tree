@@ -6,6 +6,7 @@ import { ExportOutlined, SaveOutlined } from "@ant-design/icons"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import Image from 'next/image'
 import * as diff from "fast-array-diff"
+import { isEqual } from "lodash"
 
 import GenealogyTree from "./GenealogyTree"
 import PersonEditor from "./PersonEditor"
@@ -63,7 +64,7 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
       edges
     })
 
-    const { added } = diff.diff(person, currentEditorState)
+    const { added } = diff.diff(person, currentEditorState, isEqual)
 
     const batchUpsertPersonArgs = convertOnChainDataToBatchUpsertPersonArgs(added)
     const response = await signAndSubmitTransaction({
