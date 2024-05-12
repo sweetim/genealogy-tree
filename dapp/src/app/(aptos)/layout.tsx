@@ -1,4 +1,4 @@
-"use client";
+"use client"
 
 import { Flex, Layout } from "antd";
 import { Header, Content } from "antd/lib/layout/layout";
@@ -26,7 +26,8 @@ export default function CollectionLayout({
             justify="space-between"
             align="center">
             <Link href="/">
-              <GenealogyTreeLogo className="w-12" /></Link>
+              <GenealogyTreeLogo className="w-12" />
+            </Link>
             <WalletSelector />
           </Flex>
         </Header>

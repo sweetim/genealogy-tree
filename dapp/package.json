@@ -6,15 +6,14 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint",
-    "test": "vitest"
+    "lint": "next lint"
   },
   "dependencies": {
     "@ant-design/icons": "^5.3.7",
     "@ant-design/nextjs-registry": "^1.0.0",
-    "@aptos-labs/ts-sdk": "^1.13.3",
-    "@aptos-labs/wallet-adapter-ant-design": "^2.2.4",
-    "@aptos-labs/wallet-adapter-react": "^2.3.5",
+    "@aptos-labs/ts-sdk": "^1.14.0",
+    "@aptos-labs/wallet-adapter-ant-design": "^2.2.5",
+    "@aptos-labs/wallet-adapter-react": "^2.3.6",
     "@dagrejs/dagre": "^1.1.2",
     "antd": "^5.17.0",
     "dayjs": "^1.11.11",
@@ -29,9 +28,7 @@
     "zustand": "^4.5.2"
   },
   "devDependencies": {
-    "@types/d3": "^7.4.3",
     "@types/node": "^20",
-    "@types/prop-types": "^15.7.12",
     "@types/react": "^18",
     "@types/react-dom": "^18",
     "@types/uuid": "^9.0.8",
@@ -39,7 +36,6 @@
     "eslint-config-next": "14.2.3",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
-    "typescript": "^5",
-    "vitest": "^1.6.0"
+    "typescript": "^5"
   }
 }

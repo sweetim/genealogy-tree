@@ -1,5 +1,6 @@
-import CreateCollectionForm from "@/modules/collections/components/CreateCollectionForm"
 import Image from "next/image"
+
+import CreateCollectionForm from "@/modules/collections/components/CreateCollectionForm"
 
 export default function CreatePage() {
   return (
