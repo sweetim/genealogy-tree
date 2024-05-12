@@ -85,7 +85,7 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState([]);
 
-  function relayoutGraph(nodes: Node[], edges: Edge[]) {
+  const relayoutGraph = useCallback((nodes: Node[], edges: Edge[]) => {
     const layouted = getLayoutedElements(nodes, edges);
 
     setNodes([...layouted.nodes]);
@@ -94,11 +94,11 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
     window.requestAnimationFrame(() => {
       fitView();
     });
-  }
+  }, [setNodes, setEdges, fitView])
 
   useEffect(() => {
     relayoutGraph(initialNodes, initialEdges)
-  }, [initialNodes, initialEdges])
+  }, [initialNodes, initialEdges, relayoutGraph])
 
   const onConnect: OnConnect = useCallback(
     (params) => {
@@ -140,7 +140,7 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
         currentMousePoisition.x,
         currentMousePoisition.y)
     },
-    [screenToFlowPosition, getNode],
+    [screenToFlowPosition, getNode, addNewNode],
   );
 
   function resetView() {

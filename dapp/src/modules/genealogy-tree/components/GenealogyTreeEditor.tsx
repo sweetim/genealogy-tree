@@ -1,9 +1,10 @@
 "use client"
 
-import { FC, useEffect } from "react"
+import { FC, useEffect, useState } from "react"
 import { Card, Col, Flex, Row } from "antd"
 import { ExportOutlined, SaveOutlined } from "@ant-design/icons"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
+import Image from 'next/image'
 import * as diff from "fast-array-diff"
 
 import GenealogyTree from "./GenealogyTree"
@@ -22,6 +23,8 @@ type GenealogyTreeEditorProps = {
 }
 
 const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => {
+  const [isLoading, setIsLoading] = useState(true);
+
   const collectionMetadata = useGTEditorStore(state => state.collectionMetadata)
   const setCollectionMetadata = useGTEditorStore((state) => state.setCollectionMetadata)
   const setAllPerson = useGTEditorStore((state) => state.setAllPerson)
@@ -33,16 +36,19 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
   const { signAndSubmitTransaction, account } = useWallet();
 
   useEffect(() => {
+    setIsLoading(true)
+
     Promise.all([
       getAllPersonInCollection(collectionId),
       getCollectionById(collectionId)
     ]).then(([person, collection]) => {
-      console.log(person)
       setAllPerson(person)
       setCollectionMetadata(collection)
       updateFromOnChainData()
+    }).finally(() => {
+      setIsLoading(false)
     })
-  }, [])
+  }, [collectionId, setAllPerson, setCollectionMetadata, updateFromOnChainData])
 
   function exportClickHandler() {
     console.log({
@@ -83,14 +89,28 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
     alert(`${added.length} new entries added`)
   }
 
-  return (
-    <Row className="h-full">
-      <Col className="h-full" span={6}>
-        <Flex className="h-full" vertical>
-          <Flex className="p-0" align="center" justify="space-between">
+  const renderIsLoading = () => {
+    return (
+      <div className="flex justify-center items-center h-full flex-col">
+        <Image
+          src="/growing_tree.webp"
+          width={250}
+          height={250}
+          alt="growing tree"
+        />
+        <p>seeding and growing tree...</p>
+      </div>
+    )
+  }
+
+  const renderFinishLoading = () => {
+    return (
+      <Row className="h-full" >
+        <Col className="h-full" span={6}>
+          <Flex className="h-full" vertical>
             <Card
               size="small"
-              className="!rounded-none w-full"
+              className="!rounded-none w-full !bg-slate-200"
               cover={
                 <img
                   className="min-h-40 max-h-40 object-cover !rounded-none"
@@ -110,16 +130,24 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
                 description={collectionMetadata.description}
               />
             </Card>
+            <div className="h-full overflow-auto no-scrollbar">
+              <PersonEditor edges={edges} nodes={nodes} />
+            </div>
           </Flex>
-          <div className="h-full overflow-auto no-scrollbar">
-            <PersonEditor edges={edges} nodes={nodes} />
-          </div>
-        </Flex>
-      </Col>
-      <Col span={18}>
-        <GenealogyTree edges={edges} nodes={nodes} />
-      </Col>
-    </Row>
+        </Col>
+        <Col span={18}>
+          <GenealogyTree edges={edges} nodes={nodes} />
+        </Col>
+      </Row >
+    )
+  }
+
+  return (
+    <>
+      {isLoading
+        ? renderIsLoading()
+        : renderFinishLoading()}
+    </>
   )
 }
 

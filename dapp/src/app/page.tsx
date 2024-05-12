@@ -14,7 +14,7 @@ export default async function Home() {
         alt="family potrait"
         width={500}
         height={500} />
-      <div className="text-center">
+      <div className="text-center p-2">
         <h1 className="text-5xl p-5">Genealogy Tree</h1>
         <p className="text-slate-900">tokenize your family tree here and store them to eternity in the blockchain</p>
         <p className="text-slate-900">roots run deep. plant your family tree now and watch your history blossom for generations to come</p>
