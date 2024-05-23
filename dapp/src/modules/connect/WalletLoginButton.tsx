@@ -2,6 +2,8 @@
 
 import { FC } from "react"
 import useEphemeralKeyPair from "@/store/useEphemeralKeyPair"
+import { Button } from "antd"
+import GoogleLogo from "@/icons/GoogleLogo"
 
 const WalletLoginButton: FC = () => {
   const ephemeralKeyPair = useEphemeralKeyPair()
@@ -30,12 +32,17 @@ const WalletLoginButton: FC = () => {
     nonce: ephemeralKeyPair.nonce,
   })
   redirectUrl.search = searchParams.toString()
+
   return (
-    <>
-      <a href={redirectUrl.toString()}>
-        <button>Sign in with Google</button>
-      </a>
-    </>
+    <Button
+      className="!inline-flex !align-middle"
+      shape="round"
+      href={redirectUrl.toString()}
+      icon={<GoogleLogo className="w-6 h-6" />}
+      size="large"
+    >
+      Sign in with Google
+    </Button>
   )
 }
 

@@ -1,27 +1,70 @@
 "use client"
 
-import { Flex, Layout } from "antd";
-import { Header, Content } from "antd/lib/layout/layout";
-import { WalletSelector } from "@aptos-labs/wallet-adapter-ant-design";
-import { AptosWalletAdapterProvider } from "@aptos-labs/wallet-adapter-react";
-import { PetraWallet } from "petra-plugin-wallet-adapter";
-import Link from "next/link";
+import {
+  Avatar,
+  Layout,
+  Menu,
+  MenuProps,
+} from "antd"
 
-import GenealogyTreeLogo from "@/icons/GenealogyTreeLogo";
+import { AptosWalletAdapterProvider } from "@aptos-labs/wallet-adapter-react"
+import { PetraWallet } from "petra-plugin-wallet-adapter"
+
+import GenealogyTreeLogo from "@/icons/GenealogyTreeLogo"
+import {
+  PlusOutlined,
+  UserOutlined,
+  WalletOutlined,
+} from "@ant-design/icons"
 
 const wallets = [
-  new PetraWallet()
+  new PetraWallet(),
+]
+
+const { Sider, Content } = Layout
+
+type MenuItem = Required<MenuProps>["items"][number]
+
+const menuItems: MenuItem[] = [
+  {
+    key: "0",
+    label: "Genealogy Tree",
+    icon: <GenealogyTreeLogo className="w-6" />,
+  },
+  {
+    key: "1",
+    label: "Home",
+    icon: <Avatar icon={<UserOutlined />} />,
+  },
+  {
+    key: "2",
+    label: "Wallet",
+    icon: <WalletOutlined />,
+  },
+  {
+    key: "3",
+    label: "New",
+    icon: <PlusOutlined />,
+  },
 ]
 
 export default function CollectionLayout({
   children,
 }: Readonly<{
-  children: React.ReactNode;
+  children: React.ReactNode
 }>) {
   return (
     <AptosWalletAdapterProvider plugins={wallets} autoConnect={true}>
       <Layout className="h-screen">
-        <Header className="!p-3">
+        <Sider
+          collapsedWidth={55}
+          collapsible
+        >
+          <div className="demo-logo-vertical" />
+          <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline" items={menuItems} />
+        </Sider>
+        {
+          /* <Header className="!p-3">
           <Flex className="h-full"
             justify="space-between"
             align="center">
@@ -30,7 +73,8 @@ export default function CollectionLayout({
             </Link>
             <WalletSelector />
           </Flex>
-        </Header>
+        </Header> */
+        }
         <Content className="h-full overflow-auto no-scrollbar">
           {children}
         </Content>
