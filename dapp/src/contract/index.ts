@@ -1,21 +1,21 @@
 import { getAptosClient } from "@/common/aptosClient"
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid"
 
-export const MODULE_ADDRESS = "0xcdeffa5e9a110d56e0f3fb377bfbfdb0d1df866933d2ef2110502d038b90a4a4"
+export const MODULE_ADDRESS = process.env.MODULE_ADDRESS || ""
 
 export enum PersonGender {
   Male = 1,
-  Female
+  Female,
 }
 
 export type PersonMetadata = {
-  index: number,
-  id: string,
-  name: string,
-  gender: number,
-  date_of_birth: string,
-  date_of_death: string,
-  image_uri: string,
+  index: number
+  id: string
+  name: string
+  gender: number
+  date_of_birth: string
+  date_of_death: string
+  image_uri: string
 }
 
 export function getDefaultPersonMetadata(): PersonMetadata {
@@ -31,19 +31,19 @@ export function getDefaultPersonMetadata(): PersonMetadata {
 }
 
 export type PersonRelationship = {
-  parent_ids: string[],
+  parent_ids: string[]
   children_ids: string[]
 }
 
 export type Person = {
-  metadata: PersonMetadata,
+  metadata: PersonMetadata
   relationship: PersonRelationship
 }
 
 export type GenealogyTreeMetadata = {
-  id: string,
-  name: string,
-  uri: string,
+  id: string
+  name: string
+  uri: string
   description: string
 }
 
@@ -53,7 +53,7 @@ export async function getAllCollection(): Promise<GenealogyTreeMetadata[]> {
   const [value] = await aptos.view<GenealogyTreeMetadata[][]>({
     payload: {
       function: `${MODULE_ADDRESS}::contract::get_all_collection`,
-    }
+    },
   })
 
   return value
@@ -64,9 +64,9 @@ export async function getCollectionById(collectionId: string): Promise<Genealogy
     payload: {
       function: `${MODULE_ADDRESS}::contract::get_collection_by_id`,
       functionArguments: [
-        collectionId
-      ]
-    }
+        collectionId,
+      ],
+    },
   })
 
   return value
@@ -77,11 +77,10 @@ export async function getAllPersonInCollection(collectionId: string): Promise<Pe
     payload: {
       function: `${MODULE_ADDRESS}::contract::get_all_person`,
       functionArguments: [
-        collectionId
-      ]
-    }
+        collectionId,
+      ],
+    },
   })
 
   return value
 }
-
