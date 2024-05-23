@@ -1,6 +1,5 @@
 import { getAptosClient } from "@/common/aptosClient"
 import { v4 as uuidv4 } from "uuid"
-
 export const MODULE_ADDRESS = process.env.MODULE_ADDRESS || ""
 
 export enum PersonGender {

@@ -16,6 +16,7 @@ import {
   UserOutlined,
   WalletOutlined,
 } from "@ant-design/icons"
+import Link from "next/link"
 
 const wallets = [
   new PetraWallet(),
@@ -28,25 +29,20 @@ type MenuItem = Required<MenuProps>["items"][number]
 const menuItems: MenuItem[] = [
   {
     key: "0",
-    label: "Genealogy Tree",
+    label: <Link href="/">Genealogy Tree</Link>,
     icon: <GenealogyTreeLogo className="w-6" />,
   },
   {
     type: "divider",
   },
   {
-    key: "1",
-    label: "Home",
-    icon: <Avatar icon={<UserOutlined />} />,
-  },
-  {
     key: "2",
-    label: "Wallet",
+    label: <Link href="/wallet">Wallet</Link>,
     icon: <WalletOutlined />,
   },
   {
     key: "3",
-    label: "New",
+    label: <Link href="/create">Create</Link>,
     icon: <PlusOutlined />,
   },
 ]
