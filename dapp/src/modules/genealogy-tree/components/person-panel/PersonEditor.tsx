@@ -1,18 +1,29 @@
 "use client"
 
-import { FC, useEffect, useMemo, useState } from "react"
-import { Collapse, CollapseProps } from "antd";
-import { Node, Edge } from "reactflow"
+import {
+  FC,
+  useEffect,
+  useMemo,
+  useState,
+} from "react"
+import {
+  Collapse,
+  CollapseProps,
+} from "antd"
+import {
+  Edge,
+  Node,
+} from "reactflow"
 
-import PersonMetadataEditor, { PersonMetadataEditorProps } from "./PersonMetadataEditor";
-import { EditorNodeProps } from "../model";
-import { PersonMetadata } from "@/contract";
+import PersonMetadataEditor, { PersonMetadataEditorProps } from "./PersonMetadataEditor"
+import { EditorNodeProps } from "../../model"
+import { PersonMetadata } from "@/contract"
 
 const { Panel } = Collapse
 
 type PersonEditorProps = {
-  nodes: Node<EditorNodeProps<PersonMetadata>>[],
-  edges: Edge[],
+  nodes: Node<EditorNodeProps<PersonMetadata>>[]
+  edges: Edge[]
 }
 
 const PersonEditor: FC<PersonEditorProps> = ({ nodes }) => {
@@ -20,7 +31,7 @@ const PersonEditor: FC<PersonEditorProps> = ({ nodes }) => {
     return nodes.map(n => {
       const editorProps: PersonMetadataEditorProps = {
         id: n.id,
-        metadata: n.data.onChainData
+        metadata: n.data.onChainData,
       }
 
       const className = n.data.isNew
@@ -28,9 +39,7 @@ const PersonEditor: FC<PersonEditorProps> = ({ nodes }) => {
         : ""
 
       return (
-        <Panel key={n.id}
-          className={className}
-          header={n.data.onChainData.name}>
+        <Panel key={n.id} className={className} header={n.data.onChainData.name}>
           <PersonMetadataEditor {...editorProps} />
         </Panel>
       )
@@ -50,7 +59,8 @@ const PersonEditor: FC<PersonEditorProps> = ({ nodes }) => {
     <Collapse
       activeKey={activeKey}
       accordion
-      expandIconPosition="end">
+      expandIconPosition="end"
+    >
       {renderPanels}
     </Collapse>
   )

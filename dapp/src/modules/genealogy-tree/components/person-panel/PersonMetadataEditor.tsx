@@ -1,23 +1,35 @@
 import { FC } from "react"
 import dayjs, { Dayjs } from "dayjs"
-import { Button, DatePicker, Form, Input, Radio, Space } from "antd"
+import {
+  Button,
+  DatePicker,
+  Form,
+  Input,
+  Radio,
+  Space,
+} from "antd"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
 
 import { getAptosClient } from "@/common/aptosClient"
-import useGTEditorStore from "../store/useGTEditorStore"
-import { MODULE_ADDRESS, PersonGender, PersonMetadata, getDefaultPersonMetadata } from "@/contract"
+import useGTEditorStore from "../../store/useGTEditorStore"
+import {
+  getDefaultPersonMetadata,
+  MODULE_ADDRESS,
+  PersonGender,
+  PersonMetadata,
+} from "@/contract"
 
 export type PersonMetadataEditorProps = {
-  id: string,
+  id: string
   metadata: PersonMetadata
 }
 
 type PersonMetadataEditorForm = {
-  id: string,
-  name: string,
-  gender: number,
-  dateOfBirth: Dayjs | null,
-  dateOfDeath: Dayjs | null,
+  id: string
+  name: string
+  gender: number
+  dateOfBirth: Dayjs | null
+  dateOfDeath: Dayjs | null
 }
 
 const DATE_FORMAT = "YYYY-MM-DD"
@@ -38,7 +50,7 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
       xs: { span: 24 },
       sm: { span: 16 },
     },
-  };
+  }
 
   const updatePersonUpdateFinishHandler = (values: PersonMetadataEditorForm) => {
     const { dateOfBirth, dateOfDeath, ...others } = values
@@ -52,7 +64,7 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
       ...others,
       id,
       date_of_birth: dayjs(dateOfBirth).format(DATE_FORMAT),
-      date_of_death
+      date_of_death,
     })
   }
 
@@ -62,12 +74,12 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
       data: {
         function: `${MODULE_ADDRESS}::contract::mint_person_nft`,
         functionArguments: [
-          id
+          id,
         ],
       },
-    });
+    })
 
-    await aptos.waitForTransaction({ transactionHash: response.hash });
+    await aptos.waitForTransaction({ transactionHash: response.hash })
   }
 
   const initialValues: PersonMetadataEditorForm = {
@@ -79,14 +91,18 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
   }
 
   return (
-    <Form {...formItemLayout} variant="outlined" disabled={!account}
+    <Form
+      {...formItemLayout}
+      variant="outlined"
+      disabled={!account}
       name={`updatePersonForm-${metadata.name}`}
       onFinish={updatePersonUpdateFinishHandler}
-      initialValues={initialValues}>
-      <Form.Item label="Name" name="name" rules={[{ required: true, message: 'Please input!' }]}>
+      initialValues={initialValues}
+    >
+      <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please input!" }]}>
         <Input />
       </Form.Item>
-      <Form.Item label="Gender" name="gender" rules={[{ required: true, message: 'Please input!' }]}>
+      <Form.Item label="Gender" name="gender" rules={[{ required: true, message: "Please input!" }]}>
         <Radio.Group value={metadata.gender}>
           <Radio.Button value={PersonGender.Male}>Male</Radio.Button>
           <Radio.Button value={PersonGender.Female}>Female</Radio.Button>
@@ -95,7 +111,7 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
       <Form.Item
         label="Date of Birth"
         name="dateOfBirth"
-        rules={[{ required: true, message: 'Please input!' }]}
+        rules={[{ required: true, message: "Please input!" }]}
       >
         <DatePicker />
       </Form.Item>
@@ -106,14 +122,16 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
         <DatePicker />
       </Form.Item>
       <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
-        {account && <Space >
-          <Button type="primary" htmlType="submit">
-            Update
-          </Button>
-          <Button type="primary" danger htmlType="button" onClick={claimNFTClickHandler}>
-            Claim NFT
-          </Button>
-        </Space>}
+        {account && (
+          <Space>
+            <Button type="primary" htmlType="submit">
+              Update
+            </Button>
+            <Button type="primary" danger htmlType="button" onClick={claimNFTClickHandler}>
+              Claim NFT
+            </Button>
+          </Space>
+        )}
       </Form.Item>
     </Form>
   )

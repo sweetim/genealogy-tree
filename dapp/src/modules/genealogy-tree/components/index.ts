@@ -1,1 +1,1 @@
-export { default as GenealogyTree } from "./GenealogyTree"
+export { default as GenealogyTree } from "./editor-panel/GenealogyTree"

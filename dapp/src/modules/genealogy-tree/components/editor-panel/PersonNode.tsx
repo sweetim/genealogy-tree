@@ -1,13 +1,22 @@
 "use client"
 
-import { Handle, NodeProps, Position } from "reactflow";
-import { FC } from "react";
-import { Avatar, Flex, Skeleton, Typography } from "antd";
+import {
+  Handle,
+  NodeProps,
+  Position,
+} from "reactflow"
+import { FC } from "react"
+import {
+  Avatar,
+  Flex,
+  Skeleton,
+  Typography,
+} from "antd"
 
-import { EditorNodeProps } from "../model";
-import { PersonMetadata } from "@/contract";
+import { EditorNodeProps } from "../../model"
+import { PersonMetadata } from "@/contract"
 
-const { Text } = Typography;
+const { Text } = Typography
 
 const PersonNode: FC<NodeProps<EditorNodeProps<PersonMetadata>>> = ({ data, isConnectable }) => {
   const isNewPerson = data.onChainData.name?.includes("NEW Person")
@@ -23,7 +32,7 @@ const PersonNode: FC<NodeProps<EditorNodeProps<PersonMetadata>>> = ({ data, isCo
   const GENDER_TO_STRING = {
     0: "",
     1: "M",
-    2: "F"
+    2: "F",
   }
 
   const renderAvatar = isNewPerson
@@ -32,18 +41,13 @@ const PersonNode: FC<NodeProps<EditorNodeProps<PersonMetadata>>> = ({ data, isCo
 
   return (
     <div className="text-updater-node">
-      <Handle type="target"
-        className="bg-red-600"
-        position={Position.Top}
-        isConnectable={isConnectable} />
-      <Flex align="center" justify='center' vertical className='h-full'>
+      <Handle type="target" className="bg-red-600" position={Position.Top} isConnectable={isConnectable} />
+      <Flex align="center" justify="center" vertical className="h-full">
         {renderAvatar}
         <Text strong>{data.onChainData.name} ({data.onChainData.gender === 1 ? "M" : "F"})</Text>
         <Text type="secondary">{yearsOfLiving}</Text>
       </Flex>
-      <Handle type="source"
-        position={Position.Bottom}
-        isConnectable={isConnectable} />
+      <Handle type="source" position={Position.Bottom} isConnectable={isConnectable} />
     </div>
   )
 }

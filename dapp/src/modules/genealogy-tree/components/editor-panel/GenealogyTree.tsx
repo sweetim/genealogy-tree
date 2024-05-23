@@ -1,9 +1,16 @@
 "use client"
 
-import { AlignCenterOutlined } from "@ant-design/icons";
-import * as Dagre from '@dagrejs/dagre';
-import { FC, useCallback, useEffect, useMemo, useRef } from "react";
+import { AlignCenterOutlined } from "@ant-design/icons"
+import * as Dagre from "@dagrejs/dagre"
+import {
+  FC,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+} from "react"
 import ReactFlow, {
+  addEdge,
   Background,
   BackgroundVariant,
   ControlButton,
@@ -14,86 +21,91 @@ import ReactFlow, {
   OnConnectEnd,
   OnConnectStart,
   ReactFlowProvider,
-  addEdge,
   useEdgesState,
   useNodesState,
-  useReactFlow
-} from 'reactflow';
-import { v4 as uuidv4 } from "uuid";
+  useReactFlow,
+} from "reactflow"
+import { v4 as uuidv4 } from "uuid"
 
-import 'reactflow/dist/style.css';
+import "reactflow/dist/style.css"
 
-import { EditorNodeProps } from "../model";
-import PersonNode from "./PersonNode";
-import useGTEditorStore from "../store/useGTEditorStore";
-import { PersonMetadata } from "@/contract";
+import { EditorNodeProps } from "../../model"
+import PersonNode from "./PersonNode"
+import useGTEditorStore from "../../store/useGTEditorStore"
+import { PersonMetadata } from "@/contract"
 
 type GenealogyTreeProps = {
-  nodes: Node<EditorNodeProps<PersonMetadata>>[],
-  edges: Edge[],
+  nodes: Node<EditorNodeProps<PersonMetadata>>[]
+  edges: Edge[]
 }
 
 const NODE_DEFAULT_DIMENSTION = {
   width: 150,
-  height: 135
+  height: 135,
 }
 
 enum GraphDirection {
   TB = "TB",
-  LR = "LR"
+  LR = "LR",
 }
 
-const graph = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
+const graph = new Dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}))
 
 const getLayoutedElements = (nodes: Node[], edges: Edge[]) => {
   graph.setGraph({
-    rankdir: GraphDirection.TB
-  });
+    rankdir: GraphDirection.TB,
+  })
 
   edges.forEach(
-    (edge) => graph.setEdge(
-      edge.source,
-      edge.target))
+    (edge) =>
+      graph.setEdge(
+        edge.source,
+        edge.target,
+      ),
+  )
 
   nodes.forEach(
-    (node) => graph.setNode(
-      node.id,
-      {
-        width: NODE_DEFAULT_DIMENSTION.width,
-        height: NODE_DEFAULT_DIMENSTION.height
-      }));
+    (node) =>
+      graph.setNode(
+        node.id,
+        {
+          width: NODE_DEFAULT_DIMENSTION.width,
+          height: NODE_DEFAULT_DIMENSTION.height,
+        },
+      ),
+  )
 
   Dagre.layout(graph)
 
   return {
     nodes: nodes.map((node) => {
-      const { x, y } = graph.node(node.id);
-      return { ...node, position: { x, y } };
+      const { x, y } = graph.node(node.id)
+      return { ...node, position: { x, y } }
     }),
     edges,
-  };
-};
+  }
+}
 
 const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, edges: initialEdges }) => {
-  const connectingNodeId = useRef<string | null>(null);
+  const connectingNodeId = useRef<string | null>(null)
 
   // const addNewPerson = useGenealogyTreeEditorStore((state) => state.addNewPerson)
   const addNewNode = useGTEditorStore((state) => state.addNewNode)
 
-  const { fitView, screenToFlowPosition, getNode } = useReactFlow();
+  const { fitView, screenToFlowPosition, getNode } = useReactFlow()
 
-  const [nodes, setNodes, onNodesChange] = useNodesState([]);
-  const [edges, setEdges, onEdgesChange] = useEdgesState([]);
+  const [nodes, setNodes, onNodesChange] = useNodesState([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState([])
 
   const relayoutGraph = useCallback((nodes: Node[], edges: Edge[]) => {
-    const layouted = getLayoutedElements(nodes, edges);
+    const layouted = getLayoutedElements(nodes, edges)
 
-    setNodes([...layouted.nodes]);
-    setEdges([...layouted.edges]);
+    setNodes([...layouted.nodes])
+    setEdges([...layouted.edges])
 
     window.requestAnimationFrame(() => {
-      fitView();
-    });
+      fitView()
+    })
   }, [setNodes, setEdges, fitView])
 
   useEffect(() => {
@@ -106,15 +118,15 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
       setEdges((eds) => addEdge(params, eds))
     },
     [setEdges],
-  );
+  )
 
   const onConnectStart: OnConnectStart = useCallback((_, { nodeId }) => {
-    connectingNodeId.current = nodeId;
-  }, []);
+    connectingNodeId.current = nodeId
+  }, [])
 
   const onConnectEnd: OnConnectEnd = useCallback(
     (event) => {
-      if (!connectingNodeId.current) return;
+      if (!connectingNodeId.current) return
 
       const currentNode = getNode(connectingNodeId.current)
       const currentMousePoisition = screenToFlowPosition({
@@ -138,17 +150,18 @@ const GenealogyTreeReactFlow: FC<GenealogyTreeProps> = ({ nodes: initialNodes, e
         source,
         target,
         currentMousePoisition.x,
-        currentMousePoisition.y)
+        currentMousePoisition.y,
+      )
     },
     [screenToFlowPosition, getNode, addNewNode],
-  );
+  )
 
   function resetView() {
     relayoutGraph(nodes, edges)
   }
 
   const nodeTypes = useMemo(() => ({
-    personNode: PersonNode
+    personNode: PersonNode,
   }), [])
 
   return (
@@ -178,7 +191,7 @@ const GenealogyTree: FC<GenealogyTreeProps> = ({ nodes, edges }) => {
   return (
     <ReactFlowProvider>
       <GenealogyTreeReactFlow edges={edges} nodes={nodes} />
-    </ReactFlowProvider >
+    </ReactFlowProvider>
   )
 }
 
