@@ -22,7 +22,7 @@ import * as diff from "fast-array-diff"
 import { isEqual } from "lodash"
 
 import { GenealogyTree } from "./editor-panel"
-import PersonEditor from "./person-panel/PersonEditor"
+import PersonListEditor from "./person-panel/PersonListEditor"
 import {
   getAllPersonInCollection,
   getCollectionById,
@@ -170,7 +170,7 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
               />
             </Card>
             <div className="h-full overflow-auto no-scrollbar">
-              <PersonEditor edges={edges} nodes={nodes} />
+              <PersonListEditor edges={edges} nodes={nodes} />
             </div>
           </Flex>
         </Col>

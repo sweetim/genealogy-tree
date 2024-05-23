@@ -32,6 +32,9 @@ const menuItems: MenuItem[] = [
     icon: <GenealogyTreeLogo className="w-6" />,
   },
   {
+    type: "divider",
+  },
+  {
     key: "1",
     label: "Home",
     icon: <Avatar icon={<UserOutlined />} />,
@@ -61,7 +64,7 @@ export default function CollectionLayout({
           collapsible
         >
           <div className="demo-logo-vertical" />
-          <Menu theme="dark" defaultSelectedKeys={["1"]} mode="inline" items={menuItems} />
+          <Menu theme="dark" mode="inline" items={menuItems} />
         </Sider>
         {
           /* <Header className="!p-3">

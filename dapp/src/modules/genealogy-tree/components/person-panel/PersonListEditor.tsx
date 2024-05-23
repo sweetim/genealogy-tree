@@ -2,31 +2,26 @@
 
 import {
   FC,
-  useEffect,
   useMemo,
-  useState,
 } from "react"
-import {
-  Collapse,
-  CollapseProps,
-} from "antd"
+import { Collapse } from "antd"
 import {
   Edge,
   Node,
 } from "reactflow"
 
 import PersonMetadataEditor, { PersonMetadataEditorProps } from "./PersonMetadataEditor"
-import { EditorNodeProps } from "../../model"
+import { EditorNodeProps } from "@/modules/genealogy-tree/model"
 import { PersonMetadata } from "@/contract"
 
 const { Panel } = Collapse
 
-type PersonEditorProps = {
+type PersonListEditorProps = {
   nodes: Node<EditorNodeProps<PersonMetadata>>[]
   edges: Edge[]
 }
 
-const PersonEditor: FC<PersonEditorProps> = ({ nodes }) => {
+const PersonListEditor: FC<PersonListEditorProps> = ({ nodes }) => {
   const renderPanels = useMemo(() => {
     return nodes.map(n => {
       const editorProps: PersonMetadataEditorProps = {
@@ -66,4 +61,4 @@ const PersonEditor: FC<PersonEditorProps> = ({ nodes }) => {
   )
 }
 
-export default PersonEditor
+export default PersonListEditor

@@ -18,6 +18,7 @@ import {
   PersonGender,
   PersonMetadata,
 } from "@/contract"
+import UploadAvatarInput from "./UploadAvatarInput"
 
 export type PersonMetadataEditorProps = {
   id: string
@@ -91,49 +92,56 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
   }
 
   return (
-    <Form
-      {...formItemLayout}
-      variant="outlined"
-      disabled={!account}
-      name={`updatePersonForm-${metadata.name}`}
-      onFinish={updatePersonUpdateFinishHandler}
-      initialValues={initialValues}
-    >
-      <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please input!" }]}>
-        <Input />
-      </Form.Item>
-      <Form.Item label="Gender" name="gender" rules={[{ required: true, message: "Please input!" }]}>
-        <Radio.Group value={metadata.gender}>
-          <Radio.Button value={PersonGender.Male}>Male</Radio.Button>
-          <Radio.Button value={PersonGender.Female}>Female</Radio.Button>
-        </Radio.Group>
-      </Form.Item>
-      <Form.Item
-        label="Date of Birth"
-        name="dateOfBirth"
-        rules={[{ required: true, message: "Please input!" }]}
+    <>
+      <Form
+        {...formItemLayout}
+        variant="outlined"
+        // disabled={!account}
+        name={`updatePersonForm-${metadata.name}`}
+        onFinish={updatePersonUpdateFinishHandler}
+        initialValues={initialValues}
       >
-        <DatePicker />
-      </Form.Item>
-      <Form.Item
-        label="Date of Death"
-        name="dateOfDeath"
-      >
-        <DatePicker />
-      </Form.Item>
-      <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
-        {account && (
-          <Space>
-            <Button type="primary" htmlType="submit">
-              Update
-            </Button>
-            <Button type="primary" danger htmlType="button" onClick={claimNFTClickHandler}>
-              Claim NFT
-            </Button>
-          </Space>
-        )}
-      </Form.Item>
-    </Form>
+        <div className="flex justify-center">
+          <Form.Item valuePropName="fileList">
+            <UploadAvatarInput />
+          </Form.Item>
+        </div>
+        <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please input!" }]}>
+          <Input />
+        </Form.Item>
+        <Form.Item label="Gender" name="gender" rules={[{ required: true, message: "Please input!" }]}>
+          <Radio.Group value={metadata.gender}>
+            <Radio.Button value={PersonGender.Male}>Male</Radio.Button>
+            <Radio.Button value={PersonGender.Female}>Female</Radio.Button>
+          </Radio.Group>
+        </Form.Item>
+        <Form.Item
+          label="Date of Birth"
+          name="dateOfBirth"
+          rules={[{ required: true, message: "Please input!" }]}
+        >
+          <DatePicker />
+        </Form.Item>
+        <Form.Item
+          label="Date of Death"
+          name="dateOfDeath"
+        >
+          <DatePicker />
+        </Form.Item>
+        <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
+          {account && (
+            <Space>
+              <Button type="primary" htmlType="submit">
+                Update
+              </Button>
+              <Button type="primary" danger htmlType="button" onClick={claimNFTClickHandler}>
+                Claim NFT
+              </Button>
+            </Space>
+          )}
+        </Form.Item>
+      </Form>
+    </>
   )
 }
 
