@@ -1,6 +1,6 @@
 import { getAptosClient } from "@/common/aptosClient"
 import { v4 as uuidv4 } from "uuid"
-export const MODULE_ADDRESS = process.env.MODULE_ADDRESS || ""
+export const MODULE_ADDRESS = process.env.NEXT_PUBLIC_MODULE_ADDRESS || ""
 
 export enum PersonGender {
   Male = 1,
@@ -49,7 +49,7 @@ export type GenealogyTreeMetadata = {
 const aptos = getAptosClient()
 
 export async function getAllCollection(): Promise<GenealogyTreeMetadata[]> {
-  const [value] = await aptos.view<GenealogyTreeMetadata[][]>({
+  const [ value ] = await aptos.view<GenealogyTreeMetadata[][]>({
     payload: {
       function: `${MODULE_ADDRESS}::contract::get_all_collection`,
     },
@@ -59,7 +59,7 @@ export async function getAllCollection(): Promise<GenealogyTreeMetadata[]> {
 }
 
 export async function getCollectionById(collectionId: string): Promise<GenealogyTreeMetadata> {
-  const [value] = await aptos.view<GenealogyTreeMetadata[]>({
+  const [ value ] = await aptos.view<GenealogyTreeMetadata[]>({
     payload: {
       function: `${MODULE_ADDRESS}::contract::get_collection_by_id`,
       functionArguments: [
@@ -72,7 +72,7 @@ export async function getCollectionById(collectionId: string): Promise<Genealogy
 }
 
 export async function getAllPersonInCollection(collectionId: string): Promise<Person[]> {
-  const [value] = await aptos.view<Person[][]>({
+  const [ value ] = await aptos.view<Person[][]>({
     payload: {
       function: `${MODULE_ADDRESS}::contract::get_all_person`,
       functionArguments: [

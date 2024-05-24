@@ -3,7 +3,9 @@
     "module.sortImportDeclarations": "maintain",
     "module.sortExportDeclarations": "maintain",
     "semiColons": "asi",
-    "importDeclaration.forceMultiLine": "whenMultiple"
+    "importDeclaration.forceMultiLine": "whenMultiple",
+    "arrayPattern.spaceAround": true,
+    "arrayExpression.spaceAround": true
   },
   "json": {
   },

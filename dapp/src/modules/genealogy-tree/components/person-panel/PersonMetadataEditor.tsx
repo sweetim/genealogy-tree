@@ -96,20 +96,20 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
       <Form
         {...formItemLayout}
         variant="outlined"
-        // disabled={!account}
+        disabled={!account}
         name={`updatePersonForm-${metadata.name}`}
         onFinish={updatePersonUpdateFinishHandler}
         initialValues={initialValues}
       >
-        <div className="flex justify-center">
-          <Form.Item valuePropName="fileList">
-            <UploadAvatarInput />
-          </Form.Item>
-        </div>
-        <Form.Item label="Name" name="name" rules={[{ required: true, message: "Please input!" }]}>
+        <Form.Item label="Avatar" valuePropName="fileList">
+          <div className="w-full flex justify-center">
+            <UploadAvatarInput imageUri={metadata.image_uri} />
+          </div>
+        </Form.Item>
+        <Form.Item label="Name" name="name" rules={[ { required: true, message: "Please input!" } ]}>
           <Input />
         </Form.Item>
-        <Form.Item label="Gender" name="gender" rules={[{ required: true, message: "Please input!" }]}>
+        <Form.Item label="Gender" name="gender" rules={[ { required: true, message: "Please input!" } ]}>
           <Radio.Group value={metadata.gender}>
             <Radio.Button value={PersonGender.Male}>Male</Radio.Button>
             <Radio.Button value={PersonGender.Female}>Female</Radio.Button>
@@ -118,7 +118,7 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
         <Form.Item
           label="Date of Birth"
           name="dateOfBirth"
-          rules={[{ required: true, message: "Please input!" }]}
+          rules={[ { required: true, message: "Please input!" } ]}
         >
           <DatePicker />
         </Form.Item>

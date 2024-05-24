@@ -21,11 +21,15 @@ const getBase64 = (file: FileType): Promise<string> =>
     reader.onerror = (error) => reject(error)
   })
 
-const UploadAvatarInput: FC = () => {
-  const [previewOpen, setPreviewOpen] = useState(false)
-  const [previewImage, setPreviewImage] = useState("")
+type UploadAvatarInputProps = {
+  imageUri: string
+}
 
-  const [fileList, setFileList] = useState<UploadFile[]>([])
+const UploadAvatarInput: FC<UploadAvatarInputProps> = ({ imageUri }) => {
+  const [ previewOpen, setPreviewOpen ] = useState(false)
+  const [ previewImage, setPreviewImage ] = useState(imageUri)
+  console.log("here", imageUri)
+  const [ fileList, setFileList ] = useState<UploadFile[]>([])
   console.log(fileList)
   const handlePreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {

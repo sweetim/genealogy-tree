@@ -1,5 +1,5 @@
 namespace NodeJS {
   interface ProcessEnv {
-    MODULE_ADDRESS: string
+    NEXT_PUBLIC_MODULE_ADDRESS: string
   }
 }
