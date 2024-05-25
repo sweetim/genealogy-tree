@@ -7,11 +7,10 @@ import {
   ConfigProvider,
   ThemeConfig,
 } from "antd"
-import { KeylessAccountProvider } from "@/modules/connect/KeylessAccountContext"
 
 const mali = Mali({
   weight: "400",
-  subsets: ["latin"],
+  subsets: [ "latin" ],
 })
 
 const antThemeConfig: ThemeConfig = {
@@ -40,7 +39,7 @@ export default function RootLayout({
       <body className={`${mali.className} h-full`}>
         <ConfigProvider theme={antThemeConfig}>
           <AntdRegistry>
-            <KeylessAccountProvider>{children}</KeylessAccountProvider>
+            {children}
           </AntdRegistry>
         </ConfigProvider>
       </body>

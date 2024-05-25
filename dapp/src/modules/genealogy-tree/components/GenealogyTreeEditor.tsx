@@ -17,7 +17,6 @@ import {
   SaveOutlined,
 } from "@ant-design/icons"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
-import Image from "next/image"
 import * as diff from "fast-array-diff"
 import { isEqual } from "lodash"
 
@@ -34,6 +33,7 @@ import {
   convertEditorStateToOnChainData,
   convertOnChainDataToBatchUpsertPersonArgs,
 } from "../model"
+import LoadingGif from "@/modules/common/LoadingGif"
 
 const aptos = getAptosClient()
 
@@ -44,7 +44,7 @@ type GenealogyTreeEditorProps = {
 }
 
 const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => {
-  const [isLoading, setIsLoading] = useState(true)
+  const [ isLoading, setIsLoading ] = useState(true)
 
   const collectionMetadata = useGTEditorStore(state => state.collectionMetadata)
   const setCollectionMetadata = useGTEditorStore((state) => state.setCollectionMetadata)
@@ -62,14 +62,14 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
     Promise.all([
       getAllPersonInCollection(collectionId),
       getCollectionById(collectionId),
-    ]).then(([person, collection]) => {
+    ]).then(([ person, collection ]) => {
       setAllPerson(person)
       setCollectionMetadata(collection)
       updateFromOnChainData()
     }).finally(() => {
       setIsLoading(false)
     })
-  }, [collectionId, setAllPerson, setCollectionMetadata, updateFromOnChainData])
+  }, [ collectionId, setAllPerson, setCollectionMetadata, updateFromOnChainData ])
 
   function exportClickHandler() {
     console.log({
@@ -108,20 +108,6 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
     await aptos.waitForTransaction({ transactionHash: response.hash })
 
     alert(`${added.length} new entries added`)
-  }
-
-  const renderIsLoading = () => {
-    return (
-      <div className="flex justify-center items-center h-full flex-col">
-        <Image
-          src="/growing_tree.webp"
-          width={250}
-          height={250}
-          alt="growing tree"
-        />
-        <p>seeding and growing tree...</p>
-      </div>
-    )
   }
 
   const renderFinishLoading = () => {
@@ -184,7 +170,7 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
   return (
     <>
       {isLoading
-        ? renderIsLoading()
+        ? <LoadingGif />
         : renderFinishLoading()}
     </>
   )

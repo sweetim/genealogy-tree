@@ -58,6 +58,7 @@ export default function CollectionLayout({
         <Sider
           collapsedWidth={55}
           collapsible
+          defaultCollapsed={true}
         >
           <div className="demo-logo-vertical" />
           <Menu theme="dark" mode="inline" items={menuItems} />
