@@ -3,6 +3,7 @@
 import { jwtDecode } from "jwt-decode"
 import { useRouter } from "next/navigation"
 import {
+  FC,
   useEffect,
   useMemo,
 } from "react"
@@ -13,10 +14,11 @@ import {
 import type { KeylessAccountCallbackPayload } from "@/common/aptosClient"
 import LoadingGif from "@/modules/common/LoadingGif"
 import { useEphemeralKeyPairStore } from "@/store/useEphemeralKeyPairStore"
+import NoSSR from "@/modules/common/NoSSR"
 
 const aptosClient = getAptosClient()
 
-export default function CallbackPage() {
+const DeriveKeylessAccount: FC = () => {
   const router = useRouter()
 
   const ephemeralKeyPairStorage = useEphemeralKeyPairStore(state => state.ephemeralKeyPairStorage)
@@ -59,4 +61,12 @@ export default function CallbackPage() {
   }, [ jwt, jwtNonce, ephemeralKeyPairStorage ])
 
   return <LoadingGif />
+}
+
+export default function CallbackPage() {
+  return (
+    <NoSSR>
+      <DeriveKeylessAccount />
+    </NoSSR>
+  )
 }

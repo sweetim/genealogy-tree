@@ -47,3 +47,7 @@ export const formatAptCoin = (input: number): number => {
 export const formatCoin = (input: number, decimal: number): number => {
   return input / Math.pow(10, decimal)
 }
+
+export const getAPTCoinWithDecimal = (input: number): number => {
+  return input * Math.pow(10, APT_COIN_DECIMAL)
+}

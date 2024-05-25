@@ -7,12 +7,14 @@ import {
 } from "react"
 import {
   formatCoin,
+  getAPTCoinWithDecimal,
   getAptosClient,
 } from "@/common/aptosClient"
 import { useEphemeralKeyPairStore } from "@/store/useEphemeralKeyPairStore"
 import CenterDiv from "@/modules/common/CenterDiv"
 import {
   Avatar,
+  Button,
   Card,
   Flex,
   List,
@@ -44,6 +46,7 @@ type TokenData = {
 const WalletPage: FC = () => {
   const [ coinsData, setCoinsData ] = useState<CoinsData[]>([])
   const [ tokensData, setTokensData ] = useState<TokenData[]>([])
+  const [ lastUpdated, setLastUpdated ] = useState<number>(Date.now())
 
   const keylessAccount = useEphemeralKeyPairStore(state => state.keylessAccount)
 
@@ -54,6 +57,7 @@ const WalletPage: FC = () => {
       const coinsData = await aptosClient.account.getAccountCoinsData({
         accountAddress: keylessAccount.accountAddress,
       })
+
       setCoinsData(coinsData.map(data => ({
         name: data.metadata?.name || "",
         symbol: data.metadata?.symbol || "",
@@ -64,7 +68,7 @@ const WalletPage: FC = () => {
     }
 
     getCoinsData()
-  }, [ keylessAccount ])
+  }, [ keylessAccount, lastUpdated ])
 
   useEffect(() => {
     async function getDigitalAssets() {
@@ -100,7 +104,7 @@ const WalletPage: FC = () => {
                 title={item.symbol}
                 description={item.name}
               />
-              <h2 className="font-bold">{formatCoin(item.amount, item.decimals)}</h2>
+              <h2 className="font-bold mr-2 text-xl">{formatCoin(item.amount, item.decimals)}</h2>
             </List.Item>
           )}
         />
@@ -125,6 +129,17 @@ const WalletPage: FC = () => {
     },
   ]
 
+  async function faucetClickHandler() {
+    if (!keylessAccount) return
+
+    await aptosClient.fundAccount({
+      accountAddress: keylessAccount.accountAddress,
+      amount: getAPTCoinWithDecimal(1),
+    })
+
+    setLastUpdated(Date.now())
+  }
+
   return (
     <CenterDiv>
       <Flex
@@ -139,7 +154,16 @@ const WalletPage: FC = () => {
         <Paragraph ellipsis copyable className="w-48 font-extrabold">
           {keylessAccount?.accountAddress.toString()}
         </Paragraph>
-        <Tabs className="w-full px-1" defaultActiveKey="1" items={tabItems} />
+        <Flex
+          justify="center"
+          align="center"
+          gap="small"
+          className="w-96 p-3 bg-slate-200"
+        >
+          <Button className="w-1/3" onClick={faucetClickHandler}>Faucet</Button>
+          <Button className="w-1/3">Send</Button>
+        </Flex>
+        <Tabs className="w-full px-2 mx-2" defaultActiveKey="1" items={tabItems} />
       </Flex>
     </CenterDiv>
   )
