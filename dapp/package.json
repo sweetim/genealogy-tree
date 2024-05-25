@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "prebuild": "npm install @aptos-labs/ts-sdk@zeta -S",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
