@@ -14,7 +14,6 @@
     "@ant-design/icons": "^5.3.7",
     "@ant-design/nextjs-registry": "^1.0.0",
     "@aptos-labs/ts-sdk": "^1.16.0-zeta.0",
-    "@aptos-labs/wallet-adapter-ant-design": "^2.2.5",
     "@aptos-labs/wallet-adapter-react": "^2.3.6",
     "@dagrejs/dagre": "^1.1.2",
     "@vercel/blob": "^0.23.3",
@@ -26,12 +25,12 @@
     "lodash": "^4.17.21",
     "next": "14.2.3",
     "petra-plugin-wallet-adapter": "^0.4.5",
+    "postcss": "^8",
     "react": "^18",
     "react-dom": "^18",
     "reactflow": "^11.11.3",
-    "uuid": "^9.0.1",
-    "postcss": "^8",
     "tailwindcss": "^3.4.1",
+    "uuid": "^9.0.1",
     "zustand": "^4.5.2"
   },
   "devDependencies": {
