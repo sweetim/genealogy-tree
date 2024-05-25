@@ -41,5 +41,9 @@ export const validateEphemeralKeyPair = (
 }
 
 export const formatAptCoin = (input: number): number => {
-  return input / Math.pow(10, APT_COIN_DECIMAL)
+  return formatCoin(input, APT_COIN_DECIMAL)
+}
+
+export const formatCoin = (input: number, decimal: number): number => {
+  return input / Math.pow(10, decimal)
 }

@@ -59,9 +59,15 @@ export default function CollectionLayout({
           collapsedWidth={55}
           collapsible
           defaultCollapsed={true}
+          className="!bg-[#24272a]"
         >
           <div className="demo-logo-vertical" />
-          <Menu theme="dark" mode="inline" items={menuItems} />
+          <Menu
+            className="!bg-[#24272a]"
+            theme="dark"
+            mode="inline"
+            items={menuItems}
+          />
         </Sider>
         {
           /* <Header className="!p-3">
