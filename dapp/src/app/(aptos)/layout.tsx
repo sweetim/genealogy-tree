@@ -2,6 +2,7 @@
 
 import {
   Avatar,
+  ConfigProvider,
   Layout,
   Menu,
   MenuProps,
@@ -10,7 +11,6 @@ import {
 import { AptosWalletAdapterProvider } from "@aptos-labs/wallet-adapter-react"
 import { PetraWallet } from "petra-plugin-wallet-adapter"
 
-import GenealogyTreeLogo from "@/icons/GenealogyTreeLogo"
 import {
   PlusOutlined,
   UserOutlined,
@@ -29,8 +29,14 @@ type MenuItem = Required<MenuProps>["items"][number]
 const menuItems: MenuItem[] = [
   {
     key: "0",
+    className: "!p-0",
+    disabled: true,
     label: <Link href="/">Genealogy Tree</Link>,
-    icon: <GenealogyTreeLogo className="w-6" />,
+    icon: (
+      <div className="h-full w-[47px] flex items-center justify-center">
+        <Avatar className="!p-0" size={40} src="/tree.svg" />
+      </div>
+    ),
   },
   {
     type: "divider",
@@ -54,37 +60,43 @@ export default function CollectionLayout({
 }>) {
   return (
     <AptosWalletAdapterProvider plugins={wallets} autoConnect={true}>
-      <Layout className="h-screen">
-        <Sider
-          collapsedWidth={55}
-          collapsible
-          defaultCollapsed={true}
-          className="!bg-[#24272a]"
-        >
-          <div className="demo-logo-vertical" />
-          <Menu
-            className="!bg-[#24272a]"
-            theme="dark"
-            mode="inline"
-            items={menuItems}
-          />
-        </Sider>
-        {
-          /* <Header className="!p-3">
-          <Flex className="h-full"
-            justify="space-between"
-            align="center">
-            <Link href="/">
-              <GenealogyTreeLogo className="w-12" />
-            </Link>
-            <WalletSelector />
-          </Flex>
-        </Header> */
-        }
-        <Content className="h-full overflow-auto no-scrollbar">
-          {children}
-        </Content>
-      </Layout>
+      <ConfigProvider
+        theme={{
+          components: {
+            Layout: {
+              triggerBg: "#24272a",
+              siderBg: "#24272a",
+              // triggerColor: ",
+            },
+            Menu: {
+              darkItemDisabledColor: "white",
+              darkItemBg: "#24272a",
+              iconSize: 20,
+              darkItemHoverBg: "#282b2e",
+              darkItemSelectedBg: "rgb(100 116 139)",
+            },
+          },
+        }}
+      >
+        <Layout className="h-screen">
+          <Sider
+            collapsedWidth={55}
+            collapsible
+            defaultCollapsed={true}
+          >
+            <Menu
+              className="!mt-3"
+              theme="dark"
+              mode="inline"
+              defaultSelectedKeys={[ "2" ]}
+              items={menuItems}
+            />
+          </Sider>
+          <Content className="h-full overflow-auto no-scrollbar">
+            {children}
+          </Content>
+        </Layout>
+      </ConfigProvider>
     </AptosWalletAdapterProvider>
   )
 }

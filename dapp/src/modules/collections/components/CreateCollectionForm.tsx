@@ -1,14 +1,23 @@
 "use client"
 
-import { FC } from "react"
-import { WalletSelector } from "@aptos-labs/wallet-adapter-ant-design"
+import {
+  FC,
+  useMemo,
+} from "react"
 import { useWallet } from "@aptos-labs/wallet-adapter-react"
-import { Button, Form, FormProps, Input, Space } from "antd"
+import {
+  Button,
+  Form,
+  FormProps,
+  Input,
+} from "antd"
 import { useRouter } from "next/navigation"
-import { v4 as uuidv4 } from "uuid";
+import { v4 as uuidv4 } from "uuid"
 import { GenealogyTreeMetadata } from "@/contract"
 import { MODULE_ADDRESS } from "@/contract"
 import { getAptosClient } from "@/common/aptosClient"
+import LoginMethodSelection from "@/modules/connect/LoginMethodSelection"
+import { useEphemeralKeyPairStore } from "@/store/useEphemeralKeyPairStore"
 
 type CreateCollectionFormProps = {
   className?: string
@@ -19,17 +28,13 @@ const aptos = getAptosClient()
 const CreateCollectionForm: FC<CreateCollectionFormProps> = ({ className }) => {
   const router = useRouter()
   const { account, signAndSubmitTransaction } = useWallet()
+  const keylessAccount = useEphemeralKeyPairStore(state => state.keylessAccount)
 
-  const renderNotConnectUI = () => {
-    return (
-      <Space direction="vertical" size={[32, 32]}>
-        <p className="text-slate-900">Connect your wallet with us and start growing your family tree</p>
-        <WalletSelector />
-      </Space>
-    )
-  }
+  const isLogin = useMemo(() => {
+    return !!keylessAccount || !!account
+  }, [ keylessAccount, account ])
 
-  const onFinish: FormProps<GenealogyTreeMetadata>['onFinish'] = async (values) => {
+  const onFinish: FormProps<GenealogyTreeMetadata>["onFinish"] = async (values) => {
     const id = uuidv4()
 
     const response = await signAndSubmitTransaction({
@@ -40,15 +45,15 @@ const CreateCollectionForm: FC<CreateCollectionFormProps> = ({ className }) => {
           id,
           values.name,
           values.description,
-          values.uri
+          values.uri,
         ],
       },
-    });
+    })
 
-    await aptos.waitForTransaction({ transactionHash: response.hash });
+    await aptos.waitForTransaction({ transactionHash: response.hash })
 
     router.push(`/family/${encodeURIComponent(id)}`)
-  };
+  }
 
   const renderConnectUI = () => {
     return (
@@ -67,7 +72,7 @@ const CreateCollectionForm: FC<CreateCollectionFormProps> = ({ className }) => {
           <Form.Item<GenealogyTreeMetadata>
             label="Name"
             name="name"
-            rules={[{ required: true, message: 'Please input your family tree name' }]}
+            rules={[ { required: true, message: "Please input your family tree name" } ]}
           >
             <Input />
           </Form.Item>
@@ -75,7 +80,7 @@ const CreateCollectionForm: FC<CreateCollectionFormProps> = ({ className }) => {
           <Form.Item<GenealogyTreeMetadata>
             label="Description"
             name="description"
-            rules={[{ required: true, message: 'Please input your desciption' }]}
+            rules={[ { required: true, message: "Please input your desciption" } ]}
           >
             <Input.TextArea rows={6} />
           </Form.Item>
@@ -83,7 +88,7 @@ const CreateCollectionForm: FC<CreateCollectionFormProps> = ({ className }) => {
           <Form.Item<GenealogyTreeMetadata>
             label="Image"
             name="uri"
-            rules={[{ required: true, message: 'Please input your image uri' }]}
+            rules={[ { required: true, message: "Please input your image uri" } ]}
           >
             <Input />
           </Form.Item>
@@ -100,9 +105,9 @@ const CreateCollectionForm: FC<CreateCollectionFormProps> = ({ className }) => {
 
   return (
     <div>
-      {account
+      {isLogin
         ? renderConnectUI()
-        : renderNotConnectUI()}
+        : <LoginMethodSelection />}
     </div>
   )
 }

@@ -160,8 +160,8 @@ const WalletPage: FC = () => {
           gap="small"
           className="w-96 p-3 bg-slate-200"
         >
-          <Button className="w-1/3" onClick={faucetClickHandler}>Faucet</Button>
-          <Button className="w-1/3">Send</Button>
+          <Button type="primary" className="w-1/3" onClick={faucetClickHandler}>Faucet</Button>
+          <Button type="primary" className="w-1/3">Send</Button>
         </Flex>
         <Tabs className="w-full px-2 mx-2" defaultActiveKey="1" items={tabItems} />
       </Flex>

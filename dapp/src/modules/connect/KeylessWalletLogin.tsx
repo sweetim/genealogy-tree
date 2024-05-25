@@ -1,7 +1,10 @@
 "use client"
 
 import { FC } from "react"
-import { Button } from "antd"
+import {
+  Avatar,
+  Button,
+} from "antd"
 import GoogleLogo from "@/icons/GoogleLogo"
 import { useEphemeralKeyPairStore } from "@/store/useEphemeralKeyPairStore"
 import { EphemeralKeyPair } from "@aptos-labs/ts-sdk"
@@ -9,7 +12,7 @@ import { EphemeralKeyPair } from "@aptos-labs/ts-sdk"
 const googleRedirectUrl = process.env.NEXT_PUBLIC_GOOGLE_REDIRECT_URL || ""
 const clientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID || ""
 
-const WalletLoginButton: FC = () => {
+const KeylessWalletLogin: FC = () => {
   const setEphemeralKeyPair = useEphemeralKeyPairStore(state => state.setEphemeralKeyPair)
 
   function signInClickHandler() {
@@ -34,7 +37,7 @@ const WalletLoginButton: FC = () => {
       className="!inline-flex !align-middle"
       shape="round"
       onClick={signInClickHandler}
-      icon={<GoogleLogo className="w-6 h-6" />}
+      icon={<Avatar src="google.svg" size={24} />}
       size="large"
     >
       Sign in with Google
@@ -42,4 +45,4 @@ const WalletLoginButton: FC = () => {
   )
 }
 
-export default WalletLoginButton
+export default KeylessWalletLogin

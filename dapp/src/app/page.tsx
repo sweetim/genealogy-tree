@@ -3,7 +3,6 @@ import { getAllCollection } from "@/contract"
 import { Button } from "antd"
 import Image from "next/image"
 import Link from "next/link"
-import WalletLoginButton from "@/modules/connect/WalletLoginButton"
 
 export default async function Home() {
   let allCollection = await getAllCollection()
@@ -24,10 +23,11 @@ export default async function Home() {
           roots run deep. plant your family tree now and watch your history blossom for generations to come
         </p>
       </div>
-      <WalletLoginButton />
-      <Button className="m-10" shape="round" size="large" type="primary">
-        <Link href="/create">start your family tree now</Link>
-      </Button>
+      <Link href="/create">
+        <Button className="m-10" shape="round" size="large" type="primary">
+          start your family tree now
+        </Button>
+      </Link>
       <CollectionGrid data={allCollection} className="p-3" />
     </div>
   )
