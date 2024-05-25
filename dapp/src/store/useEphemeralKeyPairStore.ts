@@ -23,6 +23,7 @@ type EphemeralKeyPairActions = {
   setEphemeralKeyPair: (input: EphemeralKeyPair) => void
   removeEphemeralKeyPair: (nonce: string) => void
   setKeylessAccount: (input: KeylessAccount) => void
+  removeKeylessAccount: () => void
 }
 
 const EphemeralKeyPairEncoding = {
@@ -49,6 +50,10 @@ export const useEphemeralKeyPairStore = create<EphemeralKeyPairState & Ephemeral
         setKeylessAccount: (input: KeylessAccount) =>
           set((state) => {
             state.keylessAccount = input
+          }),
+        removeKeylessAccount: () =>
+          set((state) => {
+            state.keylessAccount = null
           }),
       }),
       {

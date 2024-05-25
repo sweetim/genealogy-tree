@@ -10,7 +10,7 @@ import {
   FC,
   useState,
 } from "react"
-
+import { upload } from "@vercel/blob/client"
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0]
 
 const getBase64 = (file: FileType): Promise<string> =>
@@ -28,9 +28,9 @@ type UploadAvatarInputProps = {
 const UploadAvatarInput: FC<UploadAvatarInputProps> = ({ imageUri }) => {
   const [ previewOpen, setPreviewOpen ] = useState(false)
   const [ previewImage, setPreviewImage ] = useState(imageUri)
-  console.log("here", imageUri)
+
   const [ fileList, setFileList ] = useState<UploadFile[]>([])
-  console.log(fileList)
+
   const handlePreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {
       file.preview = await getBase64(file.originFileObj as FileType)
@@ -49,14 +49,42 @@ const UploadAvatarInput: FC<UploadAvatarInputProps> = ({ imageUri }) => {
     </button>
   )
 
+  const uploadPros: UploadProps = {
+    action: "/api/upload",
+    listType: "picture-circle",
+    fileList,
+    onPreview: handlePreview,
+    customRequest: async (options) => {
+      console.log(options)
+      if (options.onProgress) {
+        console.log(0)
+        options.onProgress({ percent: 0 })
+      }
+
+      if (options?.file instanceof File) {
+        const file = options.file
+
+        const newBlob = await upload(file.name, file, {
+          access: "public",
+          handleUploadUrl: "/api/upload",
+        })
+
+        console.log(newBlob)
+        console.log("done")
+      }
+
+      if (options.onSuccess && options.onProgress) {
+        options.onProgress({ percent: 100 })
+        options.onSuccess("OK")
+      }
+    },
+    onChange: handleChange,
+  }
+
   return (
     <>
       <Upload
-        action="https://660d2bd96ddfa2943b33731c.mockapi.io/api/upload"
-        listType="picture-circle"
-        fileList={fileList}
-        onPreview={handlePreview}
-        onChange={handleChange}
+        {...uploadPros}
       >
         {fileList.length === 1 ? null : uploadButton}
       </Upload>
