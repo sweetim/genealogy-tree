@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npm i @aptos-labs/ts-sdk@1.14.0-zeta.7",
+    "prebuild": "npm i @aptos-labs/ts-sdk@1.14.0-zeta.7 typescript",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
