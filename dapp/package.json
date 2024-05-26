@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npm i @aptos-labs/ts-sdk@1.14.0-zeta.7 typescript",
+    "prebuild": "npm ls && npm i @aptos-labs/ts-sdk@zeta && npm ls",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -13,7 +13,7 @@
   "dependencies": {
     "@ant-design/icons": "^5.3.7",
     "@ant-design/nextjs-registry": "^1.0.0",
-    "@aptos-labs/ts-sdk": "^1.14.0-zeta.7",
+    "@aptos-labs/ts-sdk": "^1.16.0-zeta.0",
     "@aptos-labs/wallet-adapter-react": "^2.3.6",
     "@dagrejs/dagre": "^1.1.2",
     "@vercel/blob": "^0.23.3",
@@ -41,7 +41,7 @@
     "@types/uuid": "^9.0.8",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
-    "typescript": "^5",
+    "typescript": "^5.4.5",
     "vitest": "^1.6.0"
   }
 }
