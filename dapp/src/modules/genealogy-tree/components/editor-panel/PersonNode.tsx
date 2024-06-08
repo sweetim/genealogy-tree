@@ -20,10 +20,11 @@ const { Text } = Typography
 
 const PersonNode: FC<NodeProps<EditorNodeProps<PersonMetadata>>> = ({ data, isConnectable }) => {
   const isNewPerson = data.onChainData.name?.includes("NEW Person")
-  console.log(data.onChainData)
+
   const imageUri = data.onChainData.image_uri.length === 0
-    ? "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Question_Mark.svg/1200px-Question_Mark.svg.png"
+    ? "https://placehold.jp/30/aaa/ffffff/45x45.png?text=?"
     : data.onChainData.image_uri
+
   const yearOfBirth = (new Date(data.onChainData.date_of_birth || Date.now())).getFullYear()
   const yearOfDeath = data.onChainData.date_of_death
     ? (new Date(data.onChainData.date_of_death)).getFullYear()

@@ -1,6 +1,5 @@
 import { PlusOutlined } from "@ant-design/icons"
 import {
-  Form,
   GetProp,
   Image,
   Upload,
@@ -11,6 +10,7 @@ import {
   FC,
   useState,
 } from "react"
+
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0]
 
 const getBase64 = (file: FileType): Promise<string> =>
@@ -28,11 +28,21 @@ type UploadAvatarInputProps = {
 }
 
 const UploadAvatarInput: FC<UploadAvatarInputProps> = ({ imageUri, id, onUploadedImage }) => {
-  const [ form ] = Form.useForm()
   const [ previewOpen, setPreviewOpen ] = useState(false)
   const [ previewImage, setPreviewImage ] = useState(imageUri)
 
-  const [ fileList, setFileList ] = useState<UploadFile[]>([])
+  const [ fileList, setFileList ] = useState<UploadFile[]>(
+    imageUri === ""
+      ? []
+      : [
+        {
+          uid: id,
+          name: "image.png",
+          status: "done",
+          url: imageUri,
+        },
+      ],
+  )
 
   const handlePreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {
@@ -78,7 +88,7 @@ const UploadAvatarInput: FC<UploadAvatarInputProps> = ({ imageUri, id, onUploade
         formData.append(
           "file",
           file,
-          `{id}-(${file.name})`,
+          `${id}-(${file.name})`,
         )
 
         const resIpfs = await fetch(
@@ -94,7 +104,6 @@ const UploadAvatarInput: FC<UploadAvatarInputProps> = ({ imageUri, id, onUploade
 
         const json = await resIpfs.json()
 
-        console.log(json)
         const { IpfsHash } = json
 
         onUploadedImage(`https://${process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL}/${IpfsHash}`)
