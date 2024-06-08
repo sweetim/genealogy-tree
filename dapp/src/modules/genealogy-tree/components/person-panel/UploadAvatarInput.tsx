@@ -1,5 +1,6 @@
 import { PlusOutlined } from "@ant-design/icons"
 import {
+  Form,
   GetProp,
   Image,
   Upload,
@@ -10,7 +11,6 @@ import {
   FC,
   useState,
 } from "react"
-import { upload } from "@vercel/blob/client"
 type FileType = Parameters<GetProp<UploadProps, "beforeUpload">>[0]
 
 const getBase64 = (file: FileType): Promise<string> =>
@@ -22,10 +22,13 @@ const getBase64 = (file: FileType): Promise<string> =>
   })
 
 type UploadAvatarInputProps = {
+  id: string
   imageUri: string
+  onUploadedImage: (ipfsUri: string) => void
 }
 
-const UploadAvatarInput: FC<UploadAvatarInputProps> = ({ imageUri }) => {
+const UploadAvatarInput: FC<UploadAvatarInputProps> = ({ imageUri, id, onUploadedImage }) => {
+  const [ form ] = Form.useForm()
   const [ previewOpen, setPreviewOpen ] = useState(false)
   const [ previewImage, setPreviewImage ] = useState(imageUri)
 
@@ -50,27 +53,51 @@ const UploadAvatarInput: FC<UploadAvatarInputProps> = ({ imageUri }) => {
   )
 
   const uploadPros: UploadProps = {
-    action: "/api/upload",
     listType: "picture-circle",
     fileList,
     onPreview: handlePreview,
     customRequest: async (options) => {
-      console.log(options)
       if (options.onProgress) {
-        console.log(0)
         options.onProgress({ percent: 0 })
       }
 
       if (options?.file instanceof File) {
         const file = options.file
+        const resJwt = await fetch(
+          "/api/upload",
+          { method: "POST" },
+        )
 
-        const newBlob = await upload(file.name, file, {
-          access: "public",
-          handleUploadUrl: "/api/upload",
-        })
+        const { jwt } = await resJwt.json()
 
-        console.log(newBlob)
-        console.log("done")
+        if (options.onProgress) {
+          options.onProgress({ percent: 20 })
+        }
+
+        const formData = new FormData()
+        formData.append(
+          "file",
+          file,
+          `{id}-(${file.name})`,
+        )
+
+        const resIpfs = await fetch(
+          "https://api.pinata.cloud/pinning/pinFileToIPFS",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${jwt}`,
+            },
+            body: formData,
+          },
+        )
+
+        const json = await resIpfs.json()
+
+        console.log(json)
+        const { IpfsHash } = json
+
+        onUploadedImage(`https://${process.env.NEXT_PUBLIC_PINATA_GATEWAY_URL}/${IpfsHash}`)
       }
 
       if (options.onSuccess && options.onProgress) {

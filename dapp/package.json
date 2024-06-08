@@ -4,7 +4,6 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "prebuild": "npm ls && npm i @aptos-labs/ts-sdk@zeta && npm ls",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -13,11 +12,12 @@
   "dependencies": {
     "@ant-design/icons": "^5.3.7",
     "@ant-design/nextjs-registry": "^1.0.0",
-    "@aptos-labs/ts-sdk": "^1.16.0-zeta.0",
-    "@aptos-labs/wallet-adapter-react": "^2.3.6",
+    "@aptos-labs/ts-sdk": "^1.18.1",
+    "@aptos-labs/wallet-adapter-react": "^3.0.6",
     "@dagrejs/dagre": "^1.1.2",
     "@vercel/blob": "^0.23.3",
     "antd": "^5.17.0",
+    "classnames": "^2.5.1",
     "dayjs": "^1.11.11",
     "fast-array-diff": "^1.1.0",
     "immer": "^10.1.1",
@@ -25,12 +25,14 @@
     "lodash": "^4.17.21",
     "next": "14.2.3",
     "petra-plugin-wallet-adapter": "^0.4.5",
-    "postcss": "^8",
     "react": "^18",
     "react-dom": "^18",
     "reactflow": "^11.11.3",
     "tailwindcss": "^3.4.1",
     "uuid": "^9.0.1",
+    "zustand": "^4.5.2"
+  },
+  "devDependencies": {
     "@types/lodash": "^4.17.1",
     "@types/node": "^20",
     "@types/react": "^18",
@@ -38,10 +40,8 @@
     "@types/uuid": "^9.0.8",
     "eslint": "^8",
     "eslint-config-next": "14.2.3",
+    "postcss": "^8",
     "typescript": "^5.4.5",
-    "vitest": "^1.6.0",
-    "zustand": "^4.5.2"
-  },
-  "devDependencies": {
+    "vitest": "^1.6.0"
   }
 }

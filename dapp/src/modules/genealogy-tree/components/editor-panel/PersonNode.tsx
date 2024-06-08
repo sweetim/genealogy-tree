@@ -1,39 +1,35 @@
 "use client"
 
 import {
-  Handle,
-  NodeProps,
-  Position,
-} from "reactflow"
-import { FC } from "react"
-import {
   Avatar,
   Flex,
   Skeleton,
   Typography,
 } from "antd"
+import { FC } from "react"
+import {
+  Handle,
+  NodeProps,
+  Position,
+} from "reactflow"
 
-import { EditorNodeProps } from "../../model"
 import { PersonMetadata } from "@/contract"
+import { EditorNodeProps } from "../../model"
 
 const { Text } = Typography
 
 const PersonNode: FC<NodeProps<EditorNodeProps<PersonMetadata>>> = ({ data, isConnectable }) => {
   const isNewPerson = data.onChainData.name?.includes("NEW Person")
-
-  const imageUri = `https://robohash.org/${data.onChainData.name}?set=set1`
+  console.log(data.onChainData)
+  const imageUri = data.onChainData.image_uri.length === 0
+    ? "https://upload.wikimedia.org/wikipedia/commons/thumb/5/55/Question_Mark.svg/1200px-Question_Mark.svg.png"
+    : data.onChainData.image_uri
   const yearOfBirth = (new Date(data.onChainData.date_of_birth || Date.now())).getFullYear()
   const yearOfDeath = data.onChainData.date_of_death
     ? (new Date(data.onChainData.date_of_death)).getFullYear()
     : "living"
 
   const yearsOfLiving = `${yearOfBirth} - ${yearOfDeath}`
-
-  const GENDER_TO_STRING = {
-    0: "",
-    1: "M",
-    2: "F",
-  }
 
   const renderAvatar = isNewPerson
     ? <Skeleton.Avatar className="m-2 w-10" size={64} shape="circle" />

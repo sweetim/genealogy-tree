@@ -1,10 +1,13 @@
 "use client"
 
 import {
-  FC,
-  useEffect,
-  useState,
-} from "react"
+  ExportOutlined,
+  SaveOutlined,
+} from "@ant-design/icons"
+import {
+  InputTransactionData,
+  useWallet,
+} from "@aptos-labs/wallet-adapter-react"
 import {
   Button,
   Card,
@@ -12,28 +15,29 @@ import {
   Flex,
   Row,
 } from "antd"
-import {
-  ExportOutlined,
-  SaveOutlined,
-} from "@ant-design/icons"
-import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import * as diff from "fast-array-diff"
 import { isEqual } from "lodash"
+import {
+  FC,
+  useEffect,
+  useState,
+} from "react"
 
-import { GenealogyTree } from "./editor-panel"
-import PersonListEditor from "./person-panel/PersonListEditor"
+import { getAptosClient } from "@/common/aptosClient"
 import {
   getAllPersonInCollection,
   getCollectionById,
   MODULE_ADDRESS,
 } from "@/contract"
-import { getAptosClient } from "@/common/aptosClient"
-import useGTEditorStore from "../store/useGTEditorStore"
+import { useAllWalletInfo } from "@/hooks/useAllWalletInfo"
+import LoadingGif from "@/modules/common/LoadingGif"
 import {
   convertEditorStateToOnChainData,
   convertOnChainDataToBatchUpsertPersonArgs,
 } from "../model"
-import LoadingGif from "@/modules/common/LoadingGif"
+import useGTEditorStore from "../store/useGTEditorStore"
+import { GenealogyTree } from "./editor-panel"
+import PersonListEditor from "./person-panel/PersonListEditor"
 
 const aptos = getAptosClient()
 
@@ -54,7 +58,8 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
   const edges = useGTEditorStore((state) => state.edges)
   const person = useGTEditorStore((state) => state.person)
 
-  const { signAndSubmitTransaction, account } = useWallet()
+  const { signAndSubmitTransaction } = useWallet()
+  const { isConnected, accountAddress, keylessAccount, isKeylessAccountConnected } = useAllWalletInfo()
 
   useEffect(() => {
     setIsLoading(true)
@@ -79,6 +84,8 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
   }
 
   async function saveClickHandler() {
+    if (!accountAddress) return
+
     const currentEditorState = convertEditorStateToOnChainData({
       nodes,
       edges,
@@ -87,8 +94,9 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
     const { added } = diff.diff(person, currentEditorState, isEqual)
 
     const batchUpsertPersonArgs = convertOnChainDataToBatchUpsertPersonArgs(added)
-    const response = await signAndSubmitTransaction({
-      sender: account?.address,
+
+    const transactionArgs: InputTransactionData = {
+      sender: accountAddress,
       data: {
         function: `${MODULE_ADDRESS}::contract::batch_upsert_person_metadata`,
         functionArguments: [
@@ -103,9 +111,16 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
           batchUpsertPersonArgs.children_ids,
         ],
       },
-    })
+    }
 
-    await aptos.waitForTransaction({ transactionHash: response.hash })
+    const tx = isKeylessAccountConnected
+      ? await aptos.signAndSubmitTransaction({
+        signer: keylessAccount as any,
+        transaction: await aptos.transaction.build.simple(transactionArgs as any),
+      })
+      : await signAndSubmitTransaction(transactionArgs)
+
+    await aptos.waitForTransaction({ transactionHash: tx.hash })
 
     alert(`${added.length} new entries added`)
   }
@@ -125,7 +140,7 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
                   src={collectionMetadata.uri}
                 />
               }
-              actions={!account
+              actions={!isConnected
                 ? []
                 : [
                   <Button

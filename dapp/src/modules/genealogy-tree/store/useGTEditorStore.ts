@@ -1,29 +1,41 @@
-import { StateCreator, StoreMutatorIdentifier, create } from "zustand";
-import { immer } from "zustand/middleware/immer";
+import {
+  create,
+  StateCreator,
+  StoreMutatorIdentifier,
+} from "zustand"
+import { immer } from "zustand/middleware/immer"
 
-import { GenealogyTreeMetadata, Person, PersonMetadata } from "@/contract";
-import { GenealogyTreeEditorState, convertOnChainDataToEditorState, getDefaultNodes } from "../model";
+import {
+  GenealogyTreeMetadata,
+  Person,
+  PersonMetadata,
+} from "@/contract"
+import {
+  convertOnChainDataToEditorState,
+  GenealogyTreeEditorState,
+  getDefaultNodes,
+} from "../model"
 
 export type ImmerStateCreator<
   T,
   Mps extends [StoreMutatorIdentifier, unknown][] = [],
   Mcs extends [StoreMutatorIdentifier, unknown][] = [],
-> = StateCreator<T, [...Mps, ['zustand/immer', never]], Mcs>;
+> = StateCreator<T, [...Mps, ["zustand/immer", never]], Mcs>
 
-type GTEditorStateCreator = ImmerStateCreator<GTEditorStore>;
+type GTEditorStateCreator = ImmerStateCreator<GTEditorStore>
 
 type GTEditorSliceCreator<TSlice extends keyof GTEditorStore> = (
   ...params: Parameters<GTEditorStateCreator>
-) => Pick<ReturnType<GTEditorStateCreator>, TSlice>;
+) => Pick<ReturnType<GTEditorStateCreator>, TSlice>
 
 type GenealogyTreeOnChainDataState = {
-  collectionMetadata: GenealogyTreeMetadata,
+  collectionMetadata: GenealogyTreeMetadata
   person: Person[]
 }
 
 type GenealogyTreeOnChainDataAction = {
-  setCollectionMetadata: (data: GenealogyTreeMetadata) => void,
-  setAllPerson: (data: Person[]) => void,
+  setCollectionMetadata: (data: GenealogyTreeMetadata) => void
+  setAllPerson: (data: Person[]) => void
 }
 
 type GenealogyTreeOnChainDataSlice = GenealogyTreeOnChainDataState & GenealogyTreeOnChainDataAction
@@ -33,7 +45,7 @@ const genealogyTreeOnChainDataSlice: GTEditorSliceCreator<keyof GenealogyTreeOnC
     id: "",
     description: "",
     name: "",
-    uri: ""
+    uri: "",
   },
   person: [],
   setCollectionMetadata: (data) =>
@@ -47,9 +59,9 @@ const genealogyTreeOnChainDataSlice: GTEditorSliceCreator<keyof GenealogyTreeOnC
 })
 
 type GenealogyTreeEditorAction = {
-  updateFromOnChainData: () => void,
-  updateNode: (id: string, person: PersonMetadata) => void,
-  addNewNode: (id: string, source: string, target: string, mouse_x: number, mouse_y: number) => void,
+  updateFromOnChainData: () => void
+  updateNode: (id: string, person: PersonMetadata) => void
+  addNewNode: (id: string, source: string, target: string, mouse_x: number, mouse_y: number) => void
 }
 
 type GenealogyTreeEditorSlice = GenealogyTreeEditorState & GenealogyTreeEditorAction
@@ -64,12 +76,12 @@ const genealogyTreeEditorSlice: GTEditorSliceCreator<keyof GenealogyTreeEditorSl
       if (nodes.length === 0 && edges.length === 0) {
         state.nodes = getDefaultNodes()
         state.edges = []
+
+        return
       }
 
-      if (nodes.length > 0 && edges.length > 0) {
-        state.nodes = nodes
-        state.edges = edges
-      }
+      state.nodes = nodes
+      state.edges = edges
     }),
   addNewNode: (id: string, source: string, target: string, mouse_x: number, mouse_y: number) =>
     set((state) => {
@@ -77,7 +89,7 @@ const genealogyTreeEditorSlice: GTEditorSliceCreator<keyof GenealogyTreeEditorSl
         id,
         position: {
           x: mouse_x,
-          y: mouse_y
+          y: mouse_y,
         },
         type: "personNode",
         data: {
@@ -85,20 +97,20 @@ const genealogyTreeEditorSlice: GTEditorSliceCreator<keyof GenealogyTreeEditorSl
           onChainData: {
             index: 0,
             id,
-            name: "NEW person created - update here",
+            name: "NEW",
             gender: 1,
             date_of_birth: "",
             date_of_death: "",
             image_uri: "",
-          }
-        }
+          },
+        },
       })
 
       state.edges.push({
         id: `e${source}-${target}`,
         source,
         target,
-        type: 'smoothstep',
+        type: "smoothstep",
       })
     }),
   updateNode: (id: string, person: PersonMetadata) =>
@@ -107,8 +119,9 @@ const genealogyTreeEditorSlice: GTEditorSliceCreator<keyof GenealogyTreeEditorSl
       if (index !== -1) {
         state.nodes[index].data.isNew = false
         state.nodes[index].data.onChainData = person
+        console.log(person)
       }
-    })
+    }),
 })
 
 type GTEditorStore = GenealogyTreeOnChainDataSlice & GenealogyTreeEditorSlice
@@ -116,9 +129,8 @@ type GTEditorStore = GenealogyTreeOnChainDataSlice & GenealogyTreeEditorSlice
 const useGTEditorStore = create<GTEditorStore>()(
   immer((...args) => ({
     ...genealogyTreeOnChainDataSlice(...args),
-    ...genealogyTreeEditorSlice(...args)
-  }))
+    ...genealogyTreeEditorSlice(...args),
+  })),
 )
 
 export default useGTEditorStore
-

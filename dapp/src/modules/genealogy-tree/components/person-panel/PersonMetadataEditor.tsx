@@ -1,5 +1,4 @@
-import { FC } from "react"
-import dayjs, { Dayjs } from "dayjs"
+import { useWallet } from "@aptos-labs/wallet-adapter-react"
 import {
   Button,
   DatePicker,
@@ -8,16 +7,18 @@ import {
   Radio,
   Space,
 } from "antd"
-import { useWallet } from "@aptos-labs/wallet-adapter-react"
+import dayjs, { Dayjs } from "dayjs"
+import { FC } from "react"
 
 import { getAptosClient } from "@/common/aptosClient"
-import useGTEditorStore from "../../store/useGTEditorStore"
 import {
   getDefaultPersonMetadata,
   MODULE_ADDRESS,
   PersonGender,
   PersonMetadata,
 } from "@/contract"
+import { useAllWalletInfo } from "@/hooks/useAllWalletInfo"
+import useGTEditorStore from "@/modules/genealogy-tree/store/useGTEditorStore"
 import UploadAvatarInput from "./UploadAvatarInput"
 
 export type PersonMetadataEditorProps = {
@@ -29,6 +30,7 @@ type PersonMetadataEditorForm = {
   id: string
   name: string
   gender: number
+  imageUri: string
   dateOfBirth: Dayjs | null
   dateOfDeath: Dayjs | null
 }
@@ -38,8 +40,10 @@ const DATE_FORMAT = "YYYY-MM-DD"
 const aptos = getAptosClient()
 
 const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) => {
+  const [ form ] = Form.useForm()
   const { signAndSubmitTransaction, account } = useWallet()
 
+  const { isConnected } = useAllWalletInfo()
   const updateNode = useGTEditorStore((state) => state.updateNode)
 
   const formItemLayout = {
@@ -54,7 +58,7 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
   }
 
   const updatePersonUpdateFinishHandler = (values: PersonMetadataEditorForm) => {
-    const { dateOfBirth, dateOfDeath, ...others } = values
+    const { dateOfBirth, dateOfDeath, imageUri, ...others } = values
 
     const date_of_death = dateOfDeath
       ? dayjs(dateOfDeath).format(DATE_FORMAT)
@@ -66,6 +70,7 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
       id,
       date_of_birth: dayjs(dateOfBirth).format(DATE_FORMAT),
       date_of_death,
+      image_uri: imageUri,
     })
   }
 
@@ -86,9 +91,14 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
   const initialValues: PersonMetadataEditorForm = {
     id,
     name: metadata.name || "",
+    imageUri: "",
     gender: metadata.gender || 0,
     dateOfBirth: metadata.date_of_birth.length === 0 ? null : dayjs(metadata.date_of_birth),
     dateOfDeath: metadata.date_of_death.length === 0 ? null : dayjs(metadata.date_of_death),
+  }
+
+  function onUploadedImageHandler(ipfsUri: string) {
+    form.setFieldValue("imageUri", ipfsUri)
   }
 
   return (
@@ -96,14 +106,19 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
       <Form
         {...formItemLayout}
         variant="outlined"
-        disabled={!account}
+        form={form}
+        disabled={!isConnected}
         name={`updatePersonForm-${metadata.name}`}
         onFinish={updatePersonUpdateFinishHandler}
         initialValues={initialValues}
       >
-        <Form.Item label="Avatar" valuePropName="fileList">
+        <Form.Item label="Avatar" name="imageUri">
           <div className="w-full flex justify-center">
-            <UploadAvatarInput imageUri={metadata.image_uri} />
+            <UploadAvatarInput
+              id={metadata.id}
+              imageUri={metadata.image_uri}
+              onUploadedImage={onUploadedImageHandler}
+            />
           </div>
         </Form.Item>
         <Form.Item label="Name" name="name" rules={[ { required: true, message: "Please input!" } ]}>
@@ -129,7 +144,7 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
           <DatePicker />
         </Form.Item>
         <Form.Item wrapperCol={{ offset: 6, span: 16 }}>
-          {account && (
+          {isConnected && (
             <Space>
               <Button type="primary" htmlType="submit">
                 Update

@@ -14,6 +14,7 @@ export type EphemeralKeyPairStorage = {
 }
 
 type EphemeralKeyPairState = {
+  isConnected: boolean
   keylessAccount: KeylessAccount | null
   ephemeralKeyPair: EphemeralKeyPair | null
   ephemeralKeyPairStorage: EphemeralKeyPairStorage
@@ -35,8 +36,9 @@ export const useEphemeralKeyPairStore = create<EphemeralKeyPairState & Ephemeral
   immer(
     persist(
       (set, get) => ({
-        keylessAccount: null,
-        ephemeralKeyPair: null,
+        isConnected: false,
+        keylessAccount: null as any,
+        ephemeralKeyPair: null as any,
         ephemeralKeyPairStorage: {},
         setEphemeralKeyPair: (input: EphemeralKeyPair) =>
           set((state) => {
@@ -49,10 +51,12 @@ export const useEphemeralKeyPairStore = create<EphemeralKeyPairState & Ephemeral
           }),
         setKeylessAccount: (input: KeylessAccount) =>
           set((state) => {
+            state.isConnected = true
             state.keylessAccount = input
           }),
         removeKeylessAccount: () =>
           set((state) => {
+            state.isConnected = false
             state.keylessAccount = null
           }),
       }),

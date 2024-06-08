@@ -8,26 +8,25 @@ import {
   MenuProps,
 } from "antd"
 
-import {
-  AptosWalletAdapterProvider,
-  useWallet,
-} from "@aptos-labs/wallet-adapter-react"
+import { AptosWalletAdapterProvider } from "@aptos-labs/wallet-adapter-react"
 import { PetraWallet } from "petra-plugin-wallet-adapter"
 
+import { useAllWalletInfo } from "@/hooks/useAllWalletInfo"
 import {
   PlusOutlined,
   SmileFilled,
-  UserOutlined,
   WalletOutlined,
 } from "@ant-design/icons"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+import {
+  usePathname,
+  useRouter,
+} from "next/navigation"
 import {
   FC,
   ReactNode,
   useMemo,
 } from "react"
-import { useEphemeralKeyPairStore } from "@/store/useEphemeralKeyPairStore"
 
 const wallets = [
   new PetraWallet(),
@@ -39,13 +38,9 @@ type MenuItem = Required<MenuProps>["items"][number]
 
 const CollectionLayoutContainter: FC<{ children: ReactNode }> = ({ children }) => {
   const pathname = usePathname()
-  const removeKeylessAccount = useEphemeralKeyPairStore(state => state.removeKeylessAccount)
-  const keylessAccount = useEphemeralKeyPairStore(state => state.keylessAccount)
-  const { account, disconnect, connected } = useWallet()
+  const router = useRouter()
 
-  const isLogin = useMemo(() => {
-    return !!keylessAccount || !!account
-  }, [ keylessAccount, account ])
+  const { isConnected, disconnectAllWallet } = useAllWalletInfo()
 
   const menuItems: MenuItem[] = useMemo(() => {
     const loginItems: MenuItem[] = [
@@ -67,7 +62,11 @@ const CollectionLayoutContainter: FC<{ children: ReactNode }> = ({ children }) =
         label: <Link href="/">Profile</Link>,
         icon: <SmileFilled />,
         children: [
-          { key: "logout", label: "Logout", onClick: logoutClickHandler },
+          {
+            key: "logout",
+            label: isConnected ? "Logout" : "Login",
+            onClick: logoutClickHandler,
+          },
         ],
       },
     ]
@@ -86,13 +85,13 @@ const CollectionLayoutContainter: FC<{ children: ReactNode }> = ({ children }) =
       },
     ]
 
-    if (!isLogin) return nonLoginItems
+    if (!isConnected) return nonLoginItems
 
     return [
       ...nonLoginItems,
       ...loginItems,
     ]
-  }, [ isLogin ])
+  }, [ isConnected ])
 
   const activeMenu = useMemo(() => {
     return menuItems.filter(item => item?.key?.toString().includes(pathname))
@@ -100,14 +99,14 @@ const CollectionLayoutContainter: FC<{ children: ReactNode }> = ({ children }) =
   }, [ pathname, menuItems ])
 
   function logoutClickHandler() {
-    if (connected) {
-      disconnect()
-    }
-
-    if (!!keylessAccount) {
-      removeKeylessAccount()
+    if (isConnected) {
+      disconnectAllWallet()
+      router.push("/")
+    } else {
+      router.push("/create")
     }
   }
+
   return (
     <ConfigProvider
       theme={{
