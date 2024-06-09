@@ -49,7 +49,7 @@ const CreateCollectionForm: FC<CreateCollectionFormProps> = ({ className }) => {
 
     await signAndSubmitTransaction(transactionArgs)
 
-    router.push(`/family/${encodeURIComponent(values.id)}`)
+    router.push(`/collection/${encodeURIComponent(values.id)}`)
   }
 
   function onUploadedImageHandler(imageUri: string) {
