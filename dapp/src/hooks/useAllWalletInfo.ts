@@ -1,7 +1,10 @@
 import { getAptosClient } from "@/common/aptosClient"
 import { useEphemeralKeyPairStore } from "@/store/useEphemeralKeyPairStore"
 import { AccountAddress } from "@aptos-labs/ts-sdk"
-import { useWallet } from "@aptos-labs/wallet-adapter-react"
+import {
+  InputTransactionData,
+  useWallet,
+} from "@aptos-labs/wallet-adapter-react"
 
 import {
   useCallback,
@@ -39,6 +42,7 @@ export function useAllWalletInfo() {
     connected: isWalletConnected,
     account: walletAccount,
     disconnect: walletDisconnect,
+    signAndSubmitTransaction: signAndSubmitTransactionUsingWallet,
   } = useWallet()
 
   const keylessAccount = useEphemeralKeyPairStore(state => state.keylessAccount)
@@ -105,6 +109,17 @@ export function useAllWalletInfo() {
     }
   }, [ keylessAccount, walletAccount, walletDisconnect ])
 
+  const signAndSubmitTransaction = useCallback(async (transactionArgs: InputTransactionData) => {
+    const tx = isKeylessAccountConnected
+      ? await aptosClient.signAndSubmitTransaction({
+        signer: keylessAccount as any,
+        transaction: await aptosClient.transaction.build.simple(transactionArgs as any),
+      })
+      : await signAndSubmitTransactionUsingWallet(transactionArgs)
+
+    return await aptosClient.waitForTransaction({ transactionHash: tx.hash })
+  }, [ isKeylessAccountConnected, signAndSubmitTransactionUsingWallet, aptosClient ])
+
   return {
     isConnected: isWalletConnected || isKeylessAccountConnected,
     isWalletConnected,
@@ -115,5 +130,6 @@ export function useAllWalletInfo() {
     coinsData,
     digitalAssetsData,
     disconnectAllWallet,
+    signAndSubmitTransaction,
   }
 }

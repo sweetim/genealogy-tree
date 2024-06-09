@@ -1,18 +1,18 @@
 "use client"
 
+import { Collapse } from "antd"
 import {
   FC,
   useMemo,
 } from "react"
-import { Collapse } from "antd"
 import {
   Edge,
   Node,
 } from "reactflow"
 
-import PersonMetadataEditor, { PersonMetadataEditorProps } from "./PersonMetadataEditor"
-import { EditorNodeProps } from "@/modules/genealogy-tree/model"
 import { PersonMetadata } from "@/contract"
+import { EditorNodeProps } from "@/modules/genealogy-tree/model"
+import PersonMetadataForm, { PersonMetadataFormProps } from "./PersonMetadataForm"
 
 const { Panel } = Collapse
 
@@ -24,7 +24,7 @@ type PersonListEditorProps = {
 const PersonListEditor: FC<PersonListEditorProps> = ({ nodes }) => {
   const renderPanels = useMemo(() => {
     return nodes.map(n => {
-      const editorProps: PersonMetadataEditorProps = {
+      const formProps: PersonMetadataFormProps = {
         id: n.id,
         metadata: n.data.onChainData,
       }
@@ -35,11 +35,11 @@ const PersonListEditor: FC<PersonListEditorProps> = ({ nodes }) => {
 
       return (
         <Panel key={n.id} className={className} header={n.data.onChainData.name}>
-          <PersonMetadataEditor {...editorProps} />
+          <PersonMetadataForm {...formProps} />
         </Panel>
       )
     })
-  }, [nodes])
+  }, [ nodes ])
 
   const activeKey = useMemo<string[] | undefined>(() => {
     const newNodeKey = nodes.filter(n => n.data.isNew)
@@ -48,7 +48,7 @@ const PersonListEditor: FC<PersonListEditorProps> = ({ nodes }) => {
     return newNodeKey.length === 0
       ? undefined
       : newNodeKey
-  }, [nodes])
+  }, [ nodes ])
 
   return (
     <Collapse

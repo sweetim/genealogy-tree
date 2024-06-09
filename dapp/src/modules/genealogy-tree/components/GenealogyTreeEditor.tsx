@@ -1,13 +1,17 @@
 "use client"
 
 import {
+  getAllPersonInCollection,
+  getCollectionById,
+  MODULE_ADDRESS,
+} from "@/contract"
+import { useAllWalletInfo } from "@/hooks/useAllWalletInfo"
+import LoadingGif from "@/modules/common/LoadingGif"
+import {
   ExportOutlined,
   SaveOutlined,
 } from "@ant-design/icons"
-import {
-  InputTransactionData,
-  useWallet,
-} from "@aptos-labs/wallet-adapter-react"
+import { InputTransactionData } from "@aptos-labs/wallet-adapter-react"
 import {
   Button,
   Card,
@@ -22,15 +26,6 @@ import {
   useEffect,
   useState,
 } from "react"
-
-import { getAptosClient } from "@/common/aptosClient"
-import {
-  getAllPersonInCollection,
-  getCollectionById,
-  MODULE_ADDRESS,
-} from "@/contract"
-import { useAllWalletInfo } from "@/hooks/useAllWalletInfo"
-import LoadingGif from "@/modules/common/LoadingGif"
 import {
   convertEditorStateToOnChainData,
   convertOnChainDataToBatchUpsertPersonArgs,
@@ -38,8 +33,6 @@ import {
 import useGTEditorStore from "../store/useGTEditorStore"
 import { GenealogyTree } from "./editor-panel"
 import PersonListEditor from "./person-panel/PersonListEditor"
-
-const aptos = getAptosClient()
 
 const { Meta } = Card
 
@@ -58,8 +51,7 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
   const edges = useGTEditorStore((state) => state.edges)
   const person = useGTEditorStore((state) => state.person)
 
-  const { signAndSubmitTransaction } = useWallet()
-  const { isConnected, accountAddress, keylessAccount, isKeylessAccountConnected } = useAllWalletInfo()
+  const { isConnected, accountAddress, signAndSubmitTransaction } = useAllWalletInfo()
 
   useEffect(() => {
     setIsLoading(true)
@@ -113,14 +105,7 @@ const GenealogyTreeEditor: FC<GenealogyTreeEditorProps> = ({ collectionId }) => 
       },
     }
 
-    const tx = isKeylessAccountConnected
-      ? await aptos.signAndSubmitTransaction({
-        signer: keylessAccount as any,
-        transaction: await aptos.transaction.build.simple(transactionArgs as any),
-      })
-      : await signAndSubmitTransaction(transactionArgs)
-
-    await aptos.waitForTransaction({ transactionHash: tx.hash })
+    await signAndSubmitTransaction(transactionArgs)
 
     alert(`${added.length} new entries added`)
   }

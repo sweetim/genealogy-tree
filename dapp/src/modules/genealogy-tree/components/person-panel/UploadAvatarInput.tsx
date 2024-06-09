@@ -1,11 +1,16 @@
-import { PlusOutlined } from "@ant-design/icons"
 import {
+  PlusOutlined,
+  UploadOutlined,
+} from "@ant-design/icons"
+import {
+  Button,
   GetProp,
   Image,
   Upload,
   UploadFile,
   UploadProps,
 } from "antd"
+import { UploadListType } from "antd/es/upload/interface"
 import {
   FC,
   useState,
@@ -24,10 +29,16 @@ const getBase64 = (file: FileType): Promise<string> =>
 type UploadAvatarInputProps = {
   id: string
   imageUri: string
+  uploadListType?: UploadListType
   onUploadedImage: (ipfsUri: string) => void
 }
 
-const UploadAvatarInput: FC<UploadAvatarInputProps> = ({ imageUri, id, onUploadedImage }) => {
+const UploadAvatarInput: FC<UploadAvatarInputProps> = ({
+  imageUri,
+  id,
+  uploadListType = "picture-circle",
+  onUploadedImage,
+}) => {
   const [ previewOpen, setPreviewOpen ] = useState(false)
   const [ previewImage, setPreviewImage ] = useState(imageUri)
 
@@ -55,15 +66,27 @@ const UploadAvatarInput: FC<UploadAvatarInputProps> = ({ imageUri, id, onUploade
 
   const handleChange: UploadProps["onChange"] = ({ fileList: newFileList }) => setFileList(newFileList)
 
-  const uploadButton = (
-    <button style={{ border: 0, background: "none" }} type="button">
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Upload</div>
-    </button>
-  )
+  const uploadButton = () => {
+    const defaultUploadTypeButton = (
+      <button style={{ border: 0, background: "none" }} type="button">
+        <PlusOutlined />
+        <div style={{ marginTop: 8 }}>Upload</div>
+      </button>
+    )
+
+    const pictureUploadTypeButton = (
+      <Button icon={<UploadOutlined />} size="middle">
+        Upload
+      </Button>
+    )
+
+    return uploadListType === "picture"
+      ? pictureUploadTypeButton
+      : defaultUploadTypeButton
+  }
 
   const uploadPros: UploadProps = {
-    listType: "picture-circle",
+    listType: uploadListType,
     fileList,
     onPreview: handlePreview,
     customRequest: async (options) => {
@@ -122,7 +145,7 @@ const UploadAvatarInput: FC<UploadAvatarInputProps> = ({ imageUri, id, onUploade
       <Upload
         {...uploadPros}
       >
-        {fileList.length === 1 ? null : uploadButton}
+        {fileList.length === 1 ? null : uploadButton()}
       </Upload>
       {previewImage && (
         <Image

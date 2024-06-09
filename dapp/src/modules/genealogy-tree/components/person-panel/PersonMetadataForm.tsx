@@ -21,12 +21,12 @@ import { useAllWalletInfo } from "@/hooks/useAllWalletInfo"
 import useGTEditorStore from "@/modules/genealogy-tree/store/useGTEditorStore"
 import UploadAvatarInput from "./UploadAvatarInput"
 
-export type PersonMetadataEditorProps = {
+export type PersonMetadataFormProps = {
   id: string
   metadata: PersonMetadata
 }
 
-type PersonMetadataEditorForm = {
+type PersonMetadataForm = {
   id: string
   name: string
   gender: number
@@ -39,7 +39,7 @@ const DATE_FORMAT = "YYYY-MM-DD"
 
 const aptos = getAptosClient()
 
-const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) => {
+const PersonMetadataEditor: FC<PersonMetadataFormProps> = ({ id, metadata }) => {
   const [ form ] = Form.useForm()
   const { signAndSubmitTransaction, account } = useWallet()
 
@@ -57,7 +57,7 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
     },
   }
 
-  const updatePersonUpdateFinishHandler = (values: PersonMetadataEditorForm) => {
+  const updatePersonUpdateFinishHandler = (values: PersonMetadataForm) => {
     const { dateOfBirth, dateOfDeath, imageUri, ...others } = values
 
     const date_of_death = dateOfDeath
@@ -88,7 +88,7 @@ const PersonMetadataEditor: FC<PersonMetadataEditorProps> = ({ id, metadata }) =
     await aptos.waitForTransaction({ transactionHash: response.hash })
   }
 
-  const initialValues: PersonMetadataEditorForm = {
+  const initialValues: PersonMetadataForm = {
     id,
     name: metadata.name || "",
     imageUri: "",

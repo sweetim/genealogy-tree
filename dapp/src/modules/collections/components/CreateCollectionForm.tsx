@@ -1,10 +1,14 @@
 "use client"
 
+import { getAptosClient } from "@/common/aptosClient"
 import {
-  FC,
-  useMemo,
-} from "react"
-import { useWallet } from "@aptos-labs/wallet-adapter-react"
+  GenealogyTreeMetadata,
+  MODULE_ADDRESS,
+} from "@/contract"
+import { useAllWalletInfo } from "@/hooks/useAllWalletInfo"
+import LoginMethodSelection from "@/modules/connect/LoginMethodSelection"
+import UploadAvatarInput from "@/modules/genealogy-tree/components/person-panel/UploadAvatarInput"
+import { InputTransactionData } from "@aptos-labs/wallet-adapter-react"
 import {
   Button,
   Form,
@@ -12,12 +16,8 @@ import {
   Input,
 } from "antd"
 import { useRouter } from "next/navigation"
+import { FC } from "react"
 import { v4 as uuidv4 } from "uuid"
-import { GenealogyTreeMetadata } from "@/contract"
-import { MODULE_ADDRESS } from "@/contract"
-import { getAptosClient } from "@/common/aptosClient"
-import LoginMethodSelection from "@/modules/connect/LoginMethodSelection"
-import { useEphemeralKeyPairStore } from "@/store/useEphemeralKeyPairStore"
 
 type CreateCollectionFormProps = {
   className?: string
@@ -26,33 +26,42 @@ type CreateCollectionFormProps = {
 const aptos = getAptosClient()
 
 const CreateCollectionForm: FC<CreateCollectionFormProps> = ({ className }) => {
+  const [ form ] = Form.useForm()
   const router = useRouter()
-  const { account, signAndSubmitTransaction } = useWallet()
-  const keylessAccount = useEphemeralKeyPairStore(state => state.keylessAccount)
-
-  const isLogin = useMemo(() => {
-    return !!keylessAccount || !!account
-  }, [ keylessAccount, account ])
+  const { isConnected, accountAddress, keylessAccount, isKeylessAccountConnected, signAndSubmitTransaction } =
+    useAllWalletInfo()
 
   const onFinish: FormProps<GenealogyTreeMetadata>["onFinish"] = async (values) => {
-    const id = uuidv4()
+    if (!accountAddress) return
 
-    const response = await signAndSubmitTransaction({
-      sender: account?.address,
+    const transactionArgs: InputTransactionData = {
+      sender: accountAddress,
       data: {
         function: `${MODULE_ADDRESS}::contract::create_genealogy_tree_collection`,
         functionArguments: [
-          id,
+          values.id,
           values.name,
           values.description,
           values.uri,
         ],
       },
-    })
+    }
 
-    await aptos.waitForTransaction({ transactionHash: response.hash })
+    await signAndSubmitTransaction(transactionArgs)
 
-    router.push(`/family/${encodeURIComponent(id)}`)
+    router.push(`/family/${encodeURIComponent(values.id)}`)
+  }
+
+  function onUploadedImageHandler(imageUri: string) {
+    console.log(imageUri)
+    form.setFieldValue("uri", imageUri)
+  }
+
+  const initialValues: GenealogyTreeMetadata = {
+    id: uuidv4(),
+    name: "",
+    description: "",
+    uri: "",
   }
 
   const renderConnectUI = () => {
@@ -60,15 +69,22 @@ const CreateCollectionForm: FC<CreateCollectionFormProps> = ({ className }) => {
       <div>
         <p className="p-5 text-slate-900">create your family tree and start growing it</p>
         <Form
+          form={form}
           name="basic"
           labelCol={{ span: 6 }}
-          // wrapperCol={{ span: 16 }}
           style={{ maxWidth: 800 }}
           size="large"
-          initialValues={{ remember: true }}
+          initialValues={initialValues}
           onFinish={onFinish}
           autoComplete="off"
         >
+          <Form.Item<GenealogyTreeMetadata>
+            label="Id"
+            name="id"
+          >
+            <Input disabled />
+          </Form.Item>
+
           <Form.Item<GenealogyTreeMetadata>
             label="Name"
             name="name"
@@ -88,9 +104,16 @@ const CreateCollectionForm: FC<CreateCollectionFormProps> = ({ className }) => {
           <Form.Item<GenealogyTreeMetadata>
             label="Image"
             name="uri"
-            rules={[ { required: true, message: "Please input your image uri" } ]}
+            rules={[ { required: true, message: "Please upload your image" } ]}
           >
-            <Input />
+            <div className="flex">
+              <UploadAvatarInput
+                id={initialValues.id}
+                imageUri={initialValues.uri}
+                uploadListType="picture"
+                onUploadedImage={onUploadedImageHandler}
+              />
+            </div>
           </Form.Item>
 
           <Form.Item wrapperCol={{ span: 24 }}>
@@ -105,7 +128,7 @@ const CreateCollectionForm: FC<CreateCollectionFormProps> = ({ className }) => {
 
   return (
     <div>
-      {isLogin
+      {isConnected
         ? renderConnectUI()
         : <LoginMethodSelection />}
     </div>
