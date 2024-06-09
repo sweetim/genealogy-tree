@@ -15,6 +15,7 @@ import { useAllWalletInfo } from "@/hooks/useAllWalletInfo"
 import {
   PlusOutlined,
   SmileFilled,
+  TeamOutlined,
   WalletOutlined,
 } from "@ant-design/icons"
 import Link from "next/link"
@@ -45,17 +46,14 @@ const CollectionLayoutContainter: FC<{ children: ReactNode }> = ({ children }) =
   const menuItems: MenuItem[] = useMemo(() => {
     const loginItems: MenuItem[] = [
       {
-        type: "divider",
+        key: "/create",
+        label: <Link href="/create">Create</Link>,
+        icon: <PlusOutlined />,
       },
       {
         key: "/wallet",
         label: <Link href="/wallet">Wallet</Link>,
         icon: <WalletOutlined />,
-      },
-      {
-        key: "/create",
-        label: <Link href="/create">Create</Link>,
-        icon: <PlusOutlined />,
       },
       {
         key: "profile",
@@ -82,6 +80,14 @@ const CollectionLayoutContainter: FC<{ children: ReactNode }> = ({ children }) =
             <Avatar className="!p-0" size={40} src="/tree.svg" />
           </div>
         ),
+      },
+      {
+        type: "divider",
+      },
+      {
+        key: "/collection",
+        label: <Link href="/collection">Collection</Link>,
+        icon: <TeamOutlined />,
       },
     ]
 

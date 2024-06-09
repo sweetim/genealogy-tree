@@ -32,6 +32,7 @@ module genealogy_tree::contract {
 
     struct PersonRelationShip has key, store, drop, copy {
         parent_ids: vector<String>,
+        partner_ids: vector<String>,
         children_ids: vector<String>,
     }
 
@@ -162,6 +163,7 @@ module genealogy_tree::contract {
         date_of_death: String,
         image_uri: String,
         parent_ids: vector<String>,
+        partner_ids: vector<String>,
         children_ids: vector<String>) acquires GenealogyTreeCollection
     {
         let collection_index = get_collection_index_from(collection_id);
@@ -185,6 +187,7 @@ module genealogy_tree::contract {
                 },
                 relationship: PersonRelationShip {
                     parent_ids,
+                    partner_ids,
                     children_ids,
                 }
             });
@@ -206,6 +209,7 @@ module genealogy_tree::contract {
         date_of_death: vector<String>,
         image_uri: vector<String>,
         parent_ids: vector<vector<String>>,
+        partner_ids: vector<vector<String>>,
         children_ids: vector<vector<String>>) acquires GenealogyTreeCollection
     {
         let batch_length = vector::length(&id);
@@ -228,6 +232,7 @@ module genealogy_tree::contract {
             let date_of_death = vector::borrow(&date_of_death, index);
             let image_uri = vector::borrow(&image_uri, index);
             let parent_ids = vector::borrow(&parent_ids, index);
+            let partner_ids = vector::borrow(&partner_ids, index);
             let children_ids = vector::borrow(&children_ids, index);
 
             upsert_person_metadata(
@@ -240,6 +245,7 @@ module genealogy_tree::contract {
                 *date_of_death,
                 *image_uri,
                 *parent_ids,
+                *partner_ids,
                 *children_ids
             );
         });
@@ -498,6 +504,7 @@ module genealogy_tree::contract {
             string::utf8(b"image_uri"),
             vector[],
             vector[],
+            vector[],
         );
 
         let collection_index = get_collection_index_from(collection_id_1);
@@ -545,6 +552,7 @@ module genealogy_tree::contract {
             string::utf8(b"image_uri"),
             vector[],
             vector[],
+            vector[],
         );
 
         upsert_person_metadata(
@@ -558,6 +566,7 @@ module genealogy_tree::contract {
             string::utf8(b"image_uri"),
             vector[],
             vector[],
+            vector[],
         );
 
         upsert_person_metadata(
@@ -569,6 +578,7 @@ module genealogy_tree::contract {
             string::utf8(b"date_of_birth"),
             string::utf8(b"date_of_death"),
             string::utf8(b"image_uri"),
+            vector[],
             vector[],
             vector[],
         );
@@ -623,6 +633,7 @@ module genealogy_tree::contract {
             string::utf8(b"image_uri"),
             vector[],
             vector[],
+            vector[],
         );
 
         upsert_person_metadata(
@@ -636,6 +647,7 @@ module genealogy_tree::contract {
             string::utf8(b"image_uri"),
             vector[],
             vector[],
+            vector[],
         );
 
         upsert_person_metadata(
@@ -647,6 +659,7 @@ module genealogy_tree::contract {
             string::utf8(b"date_of_birth"),
             string::utf8(b"date_of_death"),
             string::utf8(b"image_uri"),
+            vector[],
             vector[],
             vector[],
         );
@@ -730,6 +743,11 @@ module genealogy_tree::contract {
                 vector[ string::utf8(b"a") ],
             ],
             vector[
+                vector[],
+                vector[],
+                vector[],
+            ],
+            vector[
                 vector[ string::utf8(b"a"), string::utf8(b"c") ],
                 vector[],
                 vector[ string::utf8(b"b") ],
@@ -784,6 +802,7 @@ module genealogy_tree::contract {
             vector[],
             vector[],
             vector[],
+            vector[],
             vector[]
         );
     }
@@ -822,7 +841,9 @@ module genealogy_tree::contract {
             string::utf8(b"image_uri"),
             vector[],
             vector[],
+            vector[],
         );
+
         upsert_person_metadata(
             user_2,
             collection_id_1,
@@ -832,6 +853,7 @@ module genealogy_tree::contract {
             string::utf8(b"date_of_birth"),
             string::utf8(b"date_of_death"),
             string::utf8(b"image_uri"),
+            vector[],
             vector[],
             vector[ string::utf8(b"1") ],
         );

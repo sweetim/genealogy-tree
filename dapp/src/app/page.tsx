@@ -1,34 +1,54 @@
-import CollectionGrid from "@/modules/collections/components/CollectionGrid"
-import { getAllCollection } from "@/contract"
-import { Button } from "antd"
+import {
+  Avatar,
+  Space,
+} from "antd"
 import Image from "next/image"
 import Link from "next/link"
 
 export default async function Home() {
-  let allCollection = await getAllCollection()
-
   return (
-    <div className="flex justify-center items-center flex-col">
+    <div className="h-full flex items-start flex-row">
       <Image
-        className="p-1.5 content-center"
-        src="https://i.pinimg.com/736x/3d/28/7c/3d287c564e222651c87196b5a6104c39.jpg"
-        alt="family potrait"
-        width={500}
-        height={500}
+        className="absolute top-0  left-0 -z-10 object-cover h-screen w-screen"
+        src="/bg_family.png"
+        alt="bg_1"
+        width={1280}
+        height={720}
       />
-      <div className="text-center p-2">
-        <h1 className="text-5xl p-5">Genealogy Tree</h1>
-        <p className="text-slate-900">tokenize your family tree here and store them to eternity in the blockchain</p>
-        <p className="text-slate-900">
-          roots run deep. plant your family tree now and watch your history blossom for generations to come
-        </p>
+      <div className="mx-20 mt-32 p-5 h-1/3 rounded-xl">
+        <Space direction="vertical" size="large">
+          <Space>
+            <Avatar className="!bg-zinc-800 !p-2" size={68} src="/tree.svg" />
+            <h1 className="text-4xl">Genealogy Tree</h1>
+          </Space>
+          <Space direction="vertical" size="small">
+            <h2 className="text-6xl">
+              I have <strong>planted</strong> mine,
+            </h2>
+            <h2 className="text-black text-6xl">
+              have <strong>you</strong>?
+            </h2>
+          </Space>
+          <Space className="mt-10" size="large">
+            <Link href="/create">
+              <div className="cursor-pointer rounded-xl p-5 min-w-48 hover:font-bold border-none text-white bg-zinc-800 hover:bg-zinc-600">
+                <Space direction="vertical" size="large" align="center" className="w-full">
+                  <Image className="min-h-16 max-h-16" src="/plant_now.png" width={64} height={64} alt="plant_now" />
+                  <h1>Plant now</h1>
+                </Space>
+              </div>
+            </Link>
+            <Link href="/collection">
+              <div className="cursor-pointer rounded-xl p-5 min-w-48 hover:font-bold border-none text-white bg-zinc-800 hover:bg-zinc-600">
+                <Space direction="vertical" size="large" align="center" className="w-full">
+                  <Image className="min-h-16 max-h-16" src="/forest.png" width={64} height={64} alt="forest" />
+                  <h1>Explore forests</h1>
+                </Space>
+              </div>
+            </Link>
+          </Space>
+        </Space>
       </div>
-      <Link href="/create">
-        <Button className="m-10" shape="round" size="large" type="primary">
-          start your family tree now
-        </Button>
-      </Link>
-      <CollectionGrid data={allCollection} className="p-3" />
     </div>
   )
 }
